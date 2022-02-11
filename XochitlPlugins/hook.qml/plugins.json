@@ -1,7 +1,0 @@
-[
-{"enabled": true, "name": "XochitlMods", "type": "BUNDLE"},
-{"enabled": true, "name": "AthenaOPKG", "type": "BUNDLE"},
-{"enabled": true, "name": "AthenaLauncher", "type": "BUNDLE"},
-{"enabled": true, "name": "AthenaLockscreen", "type": "BUNDLE"},
-{"enabled": true, "name": "AthenaKernelSettings", "type": "BUNDLE"}
-]

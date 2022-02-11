@@ -26,21 +26,41 @@ build() {
 }
 
 package() {
+    set +e
     install -m 755 -D "${srcdir}"/Hook/libAthenaXochitl.so.1.0.0 "${pkgdir}"/usr/libexec/libAthenaXochitl.so
     cd "${srcdir}"/XochitlPlugins
-    install -m 644 -D common/* "${pkgdir}"/home/root/.xochitlPlugins/.common/
-    install -m 644 -D common/images/* "${pkgdir}"/home/root/.xochitlPlugins/.common/images/
-    install -m 644 -D common/images/weather/* "${pkgdir}"/home/root/.xochitlPlugins/.common/images/weather/
-    install -m 644 -D common/icons/* "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/
-    install -m 644 -D common/icons/weather/* "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/weather/
-    install -m 644 -D common/icons/modifier/* "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/modifier/
-    install -m 644 -D common/icons/empty/* "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/empty/
-    install -m 644 -D common/icons/border/* "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/border/
-    install -m 644 -D common/icons/applications/* "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/applications/
-    install -m 644 -D common/fonts/* "${pkgdir}"/home/root/.xochitlPlugins/.common/fonts/
+
+    install -d "${pkgdir}"/home/root/.xochitlPlugins/.common/Athena/
     install -m 644 -D common/Athena/* "${pkgdir}"/home/root/.xochitlPlugins/.common/Athena/
-    install -m 644 -D hook.qml/* "${pkgdir}"/usr/libexec/athenaXochitl/
-    install -m 644 -D hook.qml/settings/* "${pkgdir}"/usr/libexec/athenaXochitl/settings/
-    install -m 644 -D hook.qml/settings/UI/* "${pkgdir}"/usr/libexec/athenaXochitl/settings/UI/
+
+    install -d "${pkgdir}"/home/root/.xochitlPlugins/.common/fonts/
+    install -m 644 -D common/fonts/* "${pkgdir}"/home/root/.xochitlPlugins/.common/fonts/
+
+    install -d "${pkgdir}"/home/root/.xochitlPlugins/.common/images/weather/
+    install -m 644 -D common/images/weather/* "${pkgdir}"/home/root/.xochitlPlugins/.common/images/weather/
+
+    install -d "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/applications/
+    install -m 644 -D common/icons/applications/* "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/applications/
+
+    install -d "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/border/
+    install -m 644 -D common/icons/border/* "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/border/
+
+    install -d "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/empty/
+    install -m 644 -D common/icons/empty/* "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/empty/
+
+    install -d "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/modifier/
+    install -m 644 -D common/icons/modifier/* "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/modifier/
+
+    install -d "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/weather/
+    install -m 644 -D common/icons/weather/* "${pkgdir}"/home/root/.xochitlPlugins/.common/icons/weather/
+
+    install -d "${pkgdir}"/usr/libexec/athenaXochitl/settings/Button
     install -m 644 -D hook.qml/settings/Button/*  "${pkgdir}"/usr/libexec/athenaXochitl/settings/Button/
+
+    install -d "${pkgdir}"/usr/libexec/athenaXochitl/settings/UI
+    install -m 644 -D hook.qml/settings/UI/*  "${pkgdir}"/usr/libexec/athenaXochitl/settings/UI/
+
+    for f in $(find hook.qml/ -maxdepth 1 -type f); do
+        install -D -m 644 $f "${pkgdir}"/usr/libexec/athenaXochitl/
+    done
 }
