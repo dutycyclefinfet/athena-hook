@@ -1,0 +1,14 @@
+module Athena
+
+singleton Icons 9.9 Icons.qml
+singleton Constants 9.9 Constants.qml
+singleton Libraries 9.9 Libraries.qml
+singleton Fonts 9.9 Fonts.qml
+singleton Images 9.9 Images.qml
+
+DelayedActor 9.9 DelayedActor.qml
+FlickableListView 9.9 FlickableListView.qml
+GestureArea 9.9 GestureArea.qml
+JSONGridView 9.9 JSONGridView.qml
+JSONLoader 9.9 JSONLoader.qml
+TextShadow 9.9 TextShadow.qml
