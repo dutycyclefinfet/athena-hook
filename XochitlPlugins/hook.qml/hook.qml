@@ -12,10 +12,9 @@ Item {
     property var retVal: {"PLUGIN_SUCCESS": 0, "PLUGIN_DISABLED": 1, "PLUGIN_INVALID_HOOKID": 2, "PLUGIN_INVALID_TYPE": 3, "PLUGIN_EXCEPTION": 4, "PLUGIN_NO_SUCH_FILE": 5, "PLUGIN_OBJECT_NOT_CREATED": 6};
 
     readonly property Item root_id: hookEntryPoint.root_id
-    readonly property string pluginStore_dir: AthenaHook.storePath // "file:///home/root/.xochitlPlugins"
-    readonly property string pluginStore_json: "plugins.json"
-    readonly property string pluginStore_jsonc: "pluginsc.json"
-    readonly property var defaultPlugins: [{"name": ".hook.qml/settings", "type": "BUNDLE"}]
+    readonly property string pluginStore_dir: AthenaHook.pluginsPath // "file:///home/root/.xochitlPlugins"
+    readonly property string pluginStore_jsonc: "~/.cache/pluginsc.json" //FIXME
+    readonly property var defaultPlugins: ["/usr/libexec/athenaXochitl/settings"]
     
     property var hookedObjects: {"names": []}
 
@@ -115,12 +114,12 @@ Item {
     /////////////////////////////////////////
     // Parse plugins
     /////////////////////////////////////////
-    function parsePlugins(plugins, config) {
+    function parsePlugins(plugins) {
         var ret = retVal.PLUGIN_SUCCESS;
         
         for (var ix in plugins) {
             var plugin = plugins[ix];
-            if (config[plugin["name"]]["enabled"] == true) {
+            if (true) { //config[plugin["name"]]["enabled"] == true) { //FIXME
                 if (plugin["type"] == "BUNDLE") {
                     if (plugin["cache"] == undefined) { //Uncached
                         try {
@@ -169,42 +168,17 @@ Item {
     /////////////////////////////////////////
     // Read plugins json
     /////////////////////////////////////////
-    function readPluginsData(data) {
-        var plugins_info = JSON.parse(data);
-        if (plugins_info) {
-            parsePlugins(plugins_info);
-            plugins_info[0].hash = Hash.get(data);
-            File.write(pluginStore_jsonc, JSON.stringify(plugins_info));
-        }
-    }
-    function readPluginsAll() {
-        File.read(pluginStore_jsonc, function(data_compiled) {
-        if (AthenaHook.data)
-        File.read(pluginStore_jsonc, function(data_compiled) {
-            File.read(pluginStore_json, function(data_uncompiled) {
-                if (data_uncompiled && JSON.parse(data_compiled)[0] &&
-                JSON.parse(data_compiled)[0].hash &&
-                Hash.get(data_uncompiled)==JSON.parse(data_compiled)[0].hash) {
-                    readPluginsData(data_compiled);
-                } else {
-                    console.warn("Recompiling due to plugins.json hash mismatch.");
-                    readPluginsData(data_uncompiled);
-                }
-            }, function() {
-                File.read(pluginStore_json, function(data_uncompiled) {
-                    readPluginsData(data_uncompiled);
-                });
-            });
-        }, function() {
-            File.read(pluginStore_json, function(data_uncompiled) {
-                readPluginsData(data_uncompiled);
-            });
-        });
-    }
     function readPlugins() {
-        parsePlugins(defaultPlugins);
-        if (AthenaKernel.isRunning) {
-            readPluginsAll();
+        for (var plugin of defaultPlugins) {
+            parsePlugins({"name": plugin, "type": "BUNDLE"});
+        }
+        if (AthenaKernel.isRunning && AthenaHook.pluginsHash != "") { //FIXME
+            var plugins = [];
+            for (var plugin of AthenaHook.pluginsList) {
+                plugins.push({"name": plugin, "type": "BUNDLE"});
+            }
+            parsePlugins(plugins);
+            File.write(pluginStore_jsonc, JSON.stringify(plugins));
         }
     }
 }

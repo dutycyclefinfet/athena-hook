@@ -24,7 +24,7 @@ const char hook_athena[] =
 "    function root_keyHandler(down, keycode) {\n"
 "        hookEntryPoint.item.keyHandler(down?\"pressed\":\"released\", {\"key\": keycode});\n"
 "    }\n"
-"    source: \"file:///home/root/.xochitlPlugins/hook.qml\"\n"
+"    source: \"file:///usr/libexec/athenaXochitl/hook.qml\"\n"
 "}";
 SystemInfo sysInfo;
 
