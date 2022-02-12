@@ -13,10 +13,10 @@ class AthenaKernel : public QObject
     // CPU voltage
     Q_PROPERTY(int cpuUndervolt READ cpuUndervolt_get WRITE cpuUndervolt_set NOTIFY cpuUndervolt_changed);
     // Kernel
-    Q_PROPERTY(bool kernelBootAthena READ kernelBootAthena_get WRITE kernelBootAthena_set NOTIFY kernelBootAthena_changed);
-    Q_PROPERTY(bool kernelOverlayWipe READ kernelOverlayWipe_get WRITE kernelOverlayWipe_set NOTIFY kernelOverlayWipe_changed);
-    Q_PROPERTY(bool kernelIsAthena READ kernelIsAthena_get CONSTANT);
-    Q_PROPERTY(bool kernelWasCrashed READ kernelWasCrashed_get CONSTANT);
+    Q_PROPERTY(bool bootAthena READ bootAthena_get WRITE bootAthena_set NOTIFY bootAthena_changed);
+    Q_PROPERTY(bool overlayWipe READ overlayWipe_get WRITE overlayWipe_set NOTIFY overlayWipe_changed);
+    Q_PROPERTY(bool isAthena READ isAthena_get CONSTANT);
+    Q_PROPERTY(bool wasCrashed READ wasCrashed_get CONSTANT);
 
     QList<int> s_cpuUndervolts = {-100, -75, -50, -25, 0, 25, 50, 75};
     QStringList s_cpuUndervolts_files = {
@@ -28,10 +28,10 @@ class AthenaKernel : public QObject
     
     int m_cpuUndervolt;
     
-    bool m_kernelBootAthena;
-    bool m_kernelOverlayWipe;
-    bool m_kernelIsAthena;
-    bool m_kernelWasCrashed;
+    bool m_bootAthena;
+    bool m_overlayWipe;
+    bool m_isAthena;
+    bool m_wasCrashed;
 
 private:
     const char* athenaPath(const QString& path) {
@@ -62,60 +62,60 @@ public:
     }
     
     // Bootloader
-    bool kernelBootAthena_get() {
-        m_kernelBootAthena = (system("fw_printenv athena_fail | grep athena_fail=0 1>/dev/null 2>/dev/null")==0);
+    bool bootAthena_get() {
+        m_bootAthena = (system("fw_printenv athena_fail | grep athena_fail=0 1>/dev/null 2>/dev/null")==0);
         
-        return m_kernelBootAthena;
+        return m_bootAthena;
     }
-    void kernelBootAthena_set(bool val) {
+    void bootAthena_set(bool val) {
         if (val) {
             system("fw_setenv athena_fail 0");
         } else {
             system("fw_setenv athena_fail 1");
         }
 
-        emit kernelBootAthena_changed(val);
+        emit bootAthena_changed(val);
     }
-    bool kernelIsAthena_get() {
+    bool isAthena_get() {
         return sysInfo.athenaIsRunning;
     }
     
     // Wipe
-    bool kernelOverlayWipe_get() {
-        m_kernelOverlayWipe = (access(athenaPath("wipe_me"), F_OK)==0);
-        return m_kernelOverlayWipe;
+    bool overlayWipe_get() {
+        m_overlayWipe = (access(athenaPath("wipe_me"), F_OK)==0);
+        return m_overlayWipe;
     }
-    void kernelOverlayWipe_set(bool val) {
+    void overlayWipe_set(bool val) {
         if (val) {
             Utils::write("", athenaPath("wipe_me"));
         } else {
             remove(athenaPath("wipe_me"));
         }
 
-        emit kernelOverlayWipe_changed(val);
+        emit overlayWipe_changed(val);
     }
     
     // Kdump
-    bool kernelWasCrashed_get() {
-        m_kernelWasCrashed = (access(athenaPath(s_last_log_path), F_OK)==0);
+    bool wasCrashed_get() {
+        m_wasCrashed = (access(athenaPath(s_last_log_path), F_OK)==0);
         
-        return m_kernelWasCrashed;
+        return m_wasCrashed;
     }
-    void kernelWasCrashed_set(bool val) {
+    void wasCrashed_set(bool val) {
         if (!val) {
             remove(athenaPath(s_last_log_path));
         }
 
-        emit kernelWasCrashed_changed(val);
+        emit wasCrashed_changed(val);
     }
 
     AthenaKernel() : QObject(nullptr) {
     }
 signals:
     void cpuUndervolt_changed(int);
-    void kernelBootAthena_changed(bool);
-    void kernelOverlayWipe_changed(bool);
-    void kernelWasCrashed_changed(bool);
+    void bootAthena_changed(bool);
+    void overlayWipe_changed(bool);
+    void wasCrashed_changed(bool);
 };
 
 #endif //__ATHENAKERNEL_H__

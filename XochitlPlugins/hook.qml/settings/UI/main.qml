@@ -42,15 +42,15 @@ Item {
                 width: header.width
                 icon: Icons.icon_checkmark
                 header: qsTr("Running athena now")
-                on: AthenaSettings.kernelIsAthena
+                on: AthenaKernel.isAthena
             }
             PanelToggle {
                 id: bootAthena_s
                 width: header.width
                 icon: Icons.icon_checkmark
                 header: qsTr("Boot into Athena on restart")
-                on: AthenaSettings.kernelBootAthena
-                onPressed: AthenaSettings.kernelBootAthena = !AthenaSettings.kernelBootAthena;
+                on: AthenaKernel.bootAthena
+                onPressed: AthenaKernel.bootAthena = !AthenaKernel.bootAthena;
             }
             PanelToggle {
                 id: rootfsEncryption_s
@@ -66,15 +66,15 @@ Item {
                 width: parent.width
                 icon: Icons.icon_trashcan
                 header: qsTr("Wipe overlayfs on next boot")
-                on: AthenaSettings.kernelOverlayWipe
-                onPressed: AthenaSettings.kernelOverlayWipe = !AthenaSettings.kernelOverlayWipe
+                on: AthenaKernel.overlayWipe
+                onPressed: AthenaKernel.overlayWipe = !AthenaKernel.overlayWipe
             }
             A.PanelDelimiter {
-                visible: AthenaSettings.kernelIsAthena
+                visible: AthenaKernel.isAthena
             }
             A.PanelDropdown {
                 id: defaultUSB_s
-                visible: AthenaSettings.kernelIsAthena
+                visible: AthenaKernel.isAthena
                 header: qsTr("Active USB gadget")
                 modelList: AthenaSettings.usbModes
                 activeIndex: AthenaSettings.usbModes.indexOf(AthenaSettings.usbMode)
@@ -82,11 +82,11 @@ Item {
                 z: 9
             }
             A.PanelDelimiter {
-                visible: AthenaSettings.kernelIsAthena
+                visible: AthenaKernel.isAthena
             }
             A.PanelDropdown {
                 id: governorCPU_s
-                visible: AthenaSettings.kernelIsAthena
+                visible: AthenaKernel.isAthena
                 header: qsTr("Active CPU governor")
                 modelList: AthenaSettings.cpuGovernors
                 activeIndex: AthenaSettings.cpuGovernors.indexOf(AthenaSettings.cpuGovernor)
@@ -95,7 +95,7 @@ Item {
             }
             A.PanelSlider {
                 id: undervoltCPU_s
-                visible: AthenaSettings.kernelIsAthena
+                visible: AthenaKernel.isAthena
                 title: qsTr("Adjust CPU voltage by:")
                 suffix: qsTr("mV")
                 from: -100
@@ -104,12 +104,12 @@ Item {
                 greyOut: 0
                 alwaysShowSign: true
                 
-                value: AthenaSettings.cpuUndervolt
-                onDefaultSignal: AthenaSettings.cpuUndervolt = value;
+                value: AthenaKernel.cpuUndervolt
+                onDefaultSignal: AthenaKernel.cpuUndervolt = value;
             }
             A.PanelSlider {
                 id: zRAM_s
-                visible: AthenaSettings.kernelIsAthena
+                visible: AthenaKernel.isAthena
                 title: qsTr("Use zRAM:")
                 suffix: qsTr(" MB")
                 from: 0
@@ -123,7 +123,7 @@ Item {
             A.PanelDelimiter {}
             A.PanelSlider {
                 id: batteryLimit_s
-                visible: AthenaSettings.kernelIsAthena
+                visible: AthenaKernel.isAthena
                 title: qsTr("Limit maximum battery charge to:")
                 suffix: qsTr("%")
                 from: 50
@@ -158,15 +158,6 @@ Item {
                 
                 value: Math.floor(Settings.powerOffDelay/3600000)
                 onDefaultSignal: Settings.powerOffDelay = value*3600000;
-            }
-            A.PanelDelimiter {}
-            PanelToggle {
-                id: loadXochitlPlugins_s
-                width: parent.width
-                icon: Icons.icon_remarkable_device
-                header: qsTr("Enable Xochitl plugins")
-                on: AthenaSettings.enableXochitlPlugins
-                onPressed: AthenaSettings.enableXochitlPlugins = !AthenaSettings.enableXochitlPlugins
             }
         }
     }

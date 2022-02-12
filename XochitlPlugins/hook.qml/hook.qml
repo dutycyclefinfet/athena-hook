@@ -1,7 +1,7 @@
 import QtQuick 2.6
-import HKID.js as HKID
-import File.js as File
-import Hash.js as Hash
+import "HKID.js" as HKID
+import "File.js" as File
+import "Hash.js" as Hash
 
 Item {
     id: root
@@ -47,7 +47,7 @@ Item {
     // Load plugin
     /////////////////////////////////////////
     function loadPluginQML(plugin, obj_id) {
-        var path = root.pluginStore_dir + "/" + plugin["name"] + "/main.qml";
+        var path = plugin["name"] + "/main.qml";
         
         var component = Qt.createComponent(path);
         if (component.status == Component.Ready) {
@@ -65,7 +65,7 @@ Item {
         return retVal.PLUGIN_SUCCESS;
     }
     function loadPluginJS(plugin, obj_id) {
-        var f_inj_code = File.read(root.pluginStore_dir + "/" + plugin["name"] + "/main.js");
+        var f_inj_code = File.read(plugin["name"] + "/main.js");
         if (!f_inj_code)
             return retVal.PLUGIN_NO_SUCH_FILE;
         
@@ -124,13 +124,11 @@ Item {
                     if (plugin["cache"] == undefined) { //Uncached
                         try {
                             var pluginName = plugin["name"];
-                            var subPlugins = JSON.parse(File.read(root.pluginStore_dir + pluginName + "/manifest.json"));
-                            plugins[ix]["cache"] = []
-                            for (var subPlugin of subPlugins) {
+                            plugins[ix]["cache"] = JSON.parse(File.read(pluginName + "/manifest.json"));
+                            for (var subPlugin of plugins[ix]["cache"]) {
                                 subPlugin["name"] = pluginName + "/" + subPlugin["name"];
-                                ret = parsePlugins(subPlugin);
-                                plugins[ix]["cache"].push(subPlugin);
                             }
+                            ret = parsePlugins(plugins[ix]["cache"]);
                         } catch (error) {
                             ret = retVal.PLUGIN_NO_SUCH_FILE;
                         }
@@ -169,16 +167,16 @@ Item {
     // Read plugins json
     /////////////////////////////////////////
     function readPlugins() {
+        var plugins = [];
         for (var plugin of defaultPlugins) {
-            parsePlugins({"name": plugin, "type": "BUNDLE"});
+            plugins.push({"name": plugin, "type": "BUNDLE"});
         }
         if (AthenaKernel.isRunning && AthenaHook.pluginsHash != "") { //FIXME
-            var plugins = [];
             for (var plugin of AthenaHook.pluginsList) {
-                plugins.push({"name": plugin, "type": "BUNDLE"});
+                plugins.push({"name": root.pluginStore_dir + plugin, "type": "BUNDLE"});
             }
-            parsePlugins(plugins);
-            File.write(pluginStore_jsonc, JSON.stringify(plugins));
         }
+        parsePlugins(plugins);
+        File.write(pluginStore_jsonc, JSON.stringify(plugins));
     }
 }
