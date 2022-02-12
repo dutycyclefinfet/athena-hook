@@ -16,7 +16,7 @@ source=()
 sha256sums=()
 
 prepare() {
-    git clone https://github.com/dutycyclefinfet/athena-hook "${srcdir}"
+    git clone --depth 1 https://github.com/dutycyclefinfet/athena-hook "${srcdir}"
 }
 
 build() {
