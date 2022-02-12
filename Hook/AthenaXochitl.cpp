@@ -66,7 +66,7 @@ int QGuiApplication::exec() {
         auto hookItem = qobject_cast<QQuickItem*>(component.create());
         auto evHook = new EventHook(hookItem);
 
-        auto athenaHook = new AthenaHook();
+        auto athenaHook = new AthenaHook(c);
         auto athenaOPKG = new AthenaOPKG();
         auto athenaKernel = new AthenaKernel();
         auto athenaSettings = new AthenaSettings();

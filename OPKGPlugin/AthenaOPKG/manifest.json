@@ -1,0 +1,4 @@
+[
+{"version": 1.0, "hookid": [["^Settings$","ALL"],["Item",1]], "name": "UI", "type": "QML"},
+{"version": 1.0, "hookid": [["^Settings$","ALL"],["Item",0],["Column",0]], "name": "Button", "type": "QML"}
+]

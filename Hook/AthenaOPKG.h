@@ -45,6 +45,11 @@ public:
         
         return ret.std.split(QRegExp("[\r\n]"),Qt::SkipEmptyParts);
     }
+    Q_INVOKABLE QStringList getInstalled() {
+        auto ret = _system("opkg list-installed | grep -oe '^[a-zA-Z0-9-]*'", "");
+        
+        return ret.std.split(QRegExp("[\r\n]"),Qt::SkipEmptyParts);
+    }
     Q_INVOKABLE QStringList getUpgradable() {
         auto ret = _system("opkg list-upgradable | grep -oe '^[a-zA-Z0-9-]*'", "");
         

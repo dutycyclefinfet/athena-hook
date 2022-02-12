@@ -1,7 +1,6 @@
 import QtQuick 2.6
 import "HKID.js" as HKID
 import "File.js" as File
-import "Hash.js" as Hash
 
 Item {
     id: root
@@ -13,8 +12,10 @@ Item {
 
     readonly property Item root_id: hookEntryPoint.root_id
     readonly property string pluginStore_dir: AthenaHook.pluginsPath // "file:///home/root/.xochitlPlugins"
-    readonly property string pluginStore_jsonc: AthenaHook.env("HOME") + "/.cache/pluginsc.json" //FIXME
-    readonly property var defaultPlugins: [AthenaHook.rootPrefix + "usr/libexec/athenaXochitl/settings"]
+    readonly property string pluginStore_jsonc: AthenaHook.env("HOME") + "/.cache/xochitlPlugins.jsonc" //FIXME
+    readonly property var defaultPlugins: [
+            {"path": AthenaHook.rootPrefix + "usr/libexec/athenaXochitl/KernelSettings",
+             "name": "KernelSettings", "type": "BUNDLE", "unhashable": true}]
     
     property var hookedObjects: {"names": []}
 
@@ -47,7 +48,7 @@ Item {
     // Load plugin
     /////////////////////////////////////////
     function loadPluginQML(plugin, obj_id) {
-        var path = plugin["name"] + "/main.qml";
+        var path = plugin["path"] + "/main.qml";
         
         var component = Qt.createComponent(path);
         if (component.status == Component.Ready) {
@@ -65,7 +66,7 @@ Item {
         return retVal.PLUGIN_SUCCESS;
     }
     function loadPluginJS(plugin, obj_id) {
-        var f_inj_code = File.read(plugin["name"] + "/main.js");
+        var f_inj_code = File.read(plugin["path"] + "/main.js");
         if (!f_inj_code)
             return retVal.PLUGIN_NO_SUCH_FILE;
         
@@ -86,11 +87,16 @@ Item {
     function loadPlugin(plugin) {
         // Get injection point handle
         try {
+            if (plugin["unhashable"] == true) {
+                console.info("Plugin " + plugin[name] + " is uncacheable due to security reasons.");
+                plugin["hookid_c"] = [];
+            }
+            
             var objs = HKID.execute(root.root_id, plugin["hookid"], plugin["hookid_c"]);
             plugin["hookid_c"] = objs["hookid_c"];
             objs = objs["objects"];
         } catch (error) {
-            console.warn("Could not find the hookid: " + error);
+            console.warn("Could not execute HOOKID=" + JSON.stringify(plugins["hookid"]) + "; HOOKIDc=" + JSON.stringify(plugins["hookid_c"]) + ". " + error);
         }
         if (objs.length == 0)
             return retVal.PLUGIN_INVALID_HOOKID;
@@ -124,9 +130,10 @@ Item {
                     if (plugin["cache"] == undefined) { //Uncached
                         try {
                             var pluginName = plugin["name"];
-                            plugins[ix]["cache"] = JSON.parse(File.read(pluginName + "/manifest.json"));
+                            plugins[ix]["cache"] = JSON.parse(File.read(plugin["path"] + "/manifest.json"));
                             for (var subPlugin of plugins[ix]["cache"]) {
                                 subPlugin["name"] = pluginName + "/" + subPlugin["name"];
+                                subPlugin["path"] = subPlugin["path"] + "/" + subPlugin["name"];
                             }
                             ret = parsePlugins(plugins[ix]["cache"]);
                         } catch (error) {
@@ -167,16 +174,31 @@ Item {
     // Read plugins json
     /////////////////////////////////////////
     function readPlugins() {
+        // Try to load plugins from cache
+        var cache = {};
+        try {
+            cache = JSON.parse(File.read(pluginStore_jsonc));
+            if (AthenaHook.pluginsHash == cache["hash"]) {
+                return parsePlugins(cache["plugins"]);
+            }
+            console.warn("Rebuilding plugin cache due to hash mismatch.");
+        } catch (error) {
+            console.warn("Rebuilding plugin cache due to missing or malformed cache store.");
+        }
+        
+        // Rebuild all plugin cache from scratch
         var plugins = [];
         for (var plugin of defaultPlugins) {
-            plugins.push({"name": plugin, "type": "BUNDLE"});
+            plugins.push(plugin);
         }
-        if (AthenaKernel.isRunning && AthenaHook.pluginsHash != "") { //FIXME
+        if (AthenaKernel.isRunning) {
             for (var plugin of AthenaHook.pluginsList) {
-                plugins.push({"name": root.pluginStore_dir + plugin, "type": "BUNDLE"});
+                plugins.push({"path": root.pluginStore_dir + plugin, "name": plugin, "type": "BUNDLE"});
             }
+            parsePlugins(plugins);
+            File.write(pluginStore_jsonc, JSON.stringify({"hash": AthenaHook.pluginsHash, "plugins": plugins}));
+        } else {
+            parsePlugins(plugins);
         }
-        parsePlugins(plugins);
-        File.write(pluginStore_jsonc, JSON.stringify(plugins));
     }
 }
