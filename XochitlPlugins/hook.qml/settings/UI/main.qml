@@ -11,7 +11,7 @@ Item {
     id: root
     
     anchors.fill: parent
-    visible: parent.parent.index==10
+    visible: parent.parent.index==98
     
     Panel {
         id: header

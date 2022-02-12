@@ -26,6 +26,18 @@ const char hook_athena[] =
 "    }\n"
 "    source: \"file:///usr/libexec/athenaXochitl/hook.qml\"\n"
 "}";
+const char hook_athena_stock[] = 
+"import QtQuick 2.0\n"
+"Loader {\n"
+"    id: hookEntryPoint\n"
+"    objectName: \"hookEntryPointObj\"\n"
+"    anchors.fill: parent\n"
+"    property Item root_id: parent\n"
+"    function root_keyHandler(down, keycode) {\n"
+"        hookEntryPoint.item.keyHandler(down?\"pressed\":\"released\", {\"key\": keycode});\n"
+"    }\n"
+"    source: \"file:///home/.rootdir/usr/libexec/athenaXochitl/hook.qml\"\n"
+"}";
 SystemInfo sysInfo;
 
 void getSysInfo() {
@@ -50,7 +62,7 @@ int QGuiApplication::exec() {
 
     if (e != nullptr) {
         QQmlComponent component(e);
-        component.setData(hook_athena, QUrl("/AthenaXochitl.cpp"));
+        component.setData(sysInfo.athenaIsRunning ? hook_athena : hook_athena_stock, QUrl("/AthenaXochitl.cpp"));
         auto hookItem = qobject_cast<QQuickItem*>(component.create());
         auto evHook = new EventHook(hookItem);
 

@@ -10,10 +10,10 @@ SidebarItem {
         left: parent.left
         right: parent.right
     }
-    inverted: parent.parent.parent.selectedIndex == 10
+    inverted: parent.parent.parent.selectedIndex == 98
     active: true
     visible: true
-    onClicked: parent.parent.parent.sideBarItemClicked(10)
+    onClicked: parent.parent.parent.sideBarItemClicked(98)
     onActiveChanged: requestDelayedAntialiasing()
     delayedAntialiasing: true
 }

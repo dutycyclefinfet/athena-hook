@@ -13,8 +13,8 @@ Item {
 
     readonly property Item root_id: hookEntryPoint.root_id
     readonly property string pluginStore_dir: AthenaHook.pluginsPath // "file:///home/root/.xochitlPlugins"
-    readonly property string pluginStore_jsonc: "~/.cache/pluginsc.json" //FIXME
-    readonly property var defaultPlugins: ["/usr/libexec/athenaXochitl/settings"]
+    readonly property string pluginStore_jsonc: AthenaHook.env("HOME") + "/.cache/pluginsc.json" //FIXME
+    readonly property var defaultPlugins: [AthenaHook.rootPrefix + "usr/libexec/athenaXochitl/settings"]
     
     property var hookedObjects: {"names": []}
 

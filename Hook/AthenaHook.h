@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <QFile>
 #include <QCryptographicHash>
+#include <QProcessEnvironment>
 #include <filesystem>
 #include <string>
 #include "Utils.h"
@@ -13,11 +14,13 @@ class AthenaHook : public QObject
 {
     Q_OBJECT
     
+    Q_PROPERTY(QString rootPrefix READ rootPrefix_get CONSTANT);
     Q_PROPERTY(QStringList pluginsList READ pluginList_get CONSTANT);
     Q_PROPERTY(QString pluginsPath READ pluginPath_get CONSTANT);
     Q_PROPERTY(QStringList pluginsHashList READ pluginHashList_get CONSTANT);
     Q_PROPERTY(QString pluginsHash READ pluginHash_get CONSTANT);
     
+    QString m_rootPrefix;
     QStringList m_pluginList;
     QStringList m_hashList;
     QString m_hash;
@@ -33,6 +36,14 @@ private:
         return m_pluginList;
     }
 public:
+    Q_INVOKABLE QString env(QString name) {
+        return QProcessEnvironment::systemEnvironment().value(name);
+    };
+    QString rootPrefix_get() {
+        m_rootPrefix = sysInfo.athenaRoot;
+        
+        return m_rootPrefix;
+    };
     QStringList pluginList_get() {
         m_pluginList = listDir(sysInfo.xochitlPluginsPath);
         
