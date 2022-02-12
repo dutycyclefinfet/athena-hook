@@ -132,8 +132,8 @@ Item {
                             var pluginName = plugin["name"];
                             plugins[ix]["cache"] = JSON.parse(File.read(plugin["path"] + "/manifest.json"));
                             for (var subPlugin of plugins[ix]["cache"]) {
+                                subPlugin["path"] = plugin["path"] + "/" + subPlugin["name"];
                                 subPlugin["name"] = pluginName + "/" + subPlugin["name"];
-                                subPlugin["path"] = subPlugin["path"] + "/" + subPlugin["name"];
                             }
                             ret = parsePlugins(plugins[ix]["cache"]);
                         } catch (error) {
