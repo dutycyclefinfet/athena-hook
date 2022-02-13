@@ -3,7 +3,7 @@ pragma Singleton
 import QtQuick 2.0
 
 Item {
-    readonly property string _: "file:///home/kat/Sources/RM2-kernel/Athena-kernel/mmcblk2p4/root/.xochitlPlugins/.common/fonts/"
+    readonly property string _: AthenaHook.pluginsPath+"/.common/fonts/"
     
     FontLoader {
         id: material

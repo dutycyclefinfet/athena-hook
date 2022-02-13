@@ -3,7 +3,7 @@ pragma Singleton
 import QtQuick 2.0
 
 QtObject {
-    readonly property string w: "file:///home/kat/Sources/RM2-kernel/Athena-kernel/mmcblk2p4/root/.xochitlPlugins/.common/images/weather/"
+    readonly property string w: AthenaHook.pluginsPath+"/.common/images/weather/"
     
     readonly property var weather: {
         "01d": w+"01d.png",

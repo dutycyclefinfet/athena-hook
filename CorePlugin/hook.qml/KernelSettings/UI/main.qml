@@ -54,7 +54,7 @@ Item {
             }
             PanelToggle {
                 id: rootfsEncryption_s
-                width: parent.width
+                width: header.width
                 icon: Icons.icon_padlock
                 header: qsTr("Use dm-crypt for overlayfs")
                 on: AthenaSettings.encryptedRoot==true
@@ -63,7 +63,7 @@ Item {
             }
             PanelToggle {
                 id: rootfsClear_s
-                width: parent.width
+                width: header.width
                 icon: Icons.icon_trashcan
                 header: qsTr("Wipe overlayfs on next boot")
                 on: AthenaKernel.overlayWipe
@@ -74,6 +74,7 @@ Item {
             }
             A.PanelDropdown {
                 id: defaultUSB_s
+                width: header.width
                 visible: AthenaKernel.isAthena
                 header: qsTr("Active USB gadget")
                 modelList: AthenaSettings.usbModes
@@ -86,6 +87,7 @@ Item {
             }
             A.PanelDropdown {
                 id: governorCPU_s
+                width: header.width
                 visible: AthenaKernel.isAthena
                 header: qsTr("Active CPU governor")
                 modelList: AthenaSettings.cpuGovernors
@@ -95,6 +97,7 @@ Item {
             }
             A.PanelSlider {
                 id: undervoltCPU_s
+                width: header.width
                 visible: AthenaKernel.isAthena
                 title: qsTr("Adjust CPU voltage by:")
                 suffix: qsTr("mV")
@@ -109,6 +112,7 @@ Item {
             }
             A.PanelSlider {
                 id: zRAM_s
+                width: header.width
                 visible: AthenaKernel.isAthena
                 title: qsTr("Use zRAM:")
                 suffix: qsTr(" MB")
@@ -123,6 +127,7 @@ Item {
             A.PanelDelimiter {}
             A.PanelSlider {
                 id: batteryLimit_s
+                width: header.width
                 visible: AthenaKernel.isAthena
                 title: qsTr("Limit maximum battery charge to:")
                 suffix: qsTr("%")
@@ -136,6 +141,7 @@ Item {
             }
             A.PanelSlider {
                 id: suspend_s
+                width: header.width
                 title: qsTr("Suspend your reMarkable after:")
                 suffix: qsTr(" minutes")
                 from: 0
@@ -148,6 +154,7 @@ Item {
             }
             A.PanelSlider {
                 id: poweroff_s
+                width: header.width
                 title: qsTr("Power off your reMarkable after:")
                 suffix: qsTr(" hours")
                 from: 0

@@ -191,7 +191,7 @@ Item {
         for (var plugin of defaultPlugins) {
             plugins.push(plugin);
         }
-        if (AthenaKernel.isRunning) {
+        if (AthenaKernel.isAthena) {
             for (var plugin of AthenaHook.pluginsList) {
                 plugins.push({"path": root.pluginStore_dir + plugin, "name": plugin, "type": "BUNDLE"});
             }

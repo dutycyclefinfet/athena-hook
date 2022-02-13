@@ -3,11 +3,11 @@ pragma Singleton
 import QtQuick 2.0
 
 QtObject {
-    readonly property string a: "file:///home/kat/Sources/RM2-kernel/Athena-kernel/mmcblk2p4/root/.xochitlPlugins/.common/icons/applications/"
-    readonly property string e: "file:///home/kat/Sources/RM2-kernel/Athena-kernel/mmcblk2p4/root/.xochitlPlugins/.common/icons/empty/"
-    readonly property string b: "file:///home/kat/Sources/RM2-kernel/Athena-kernel/mmcblk2p4/root/.xochitlPlugins/.common/icons/border/"
-    readonly property string m: "file:///home/kat/Sources/RM2-kernel/Athena-kernel/mmcblk2p4/root/.xochitlPlugins/.common/icons/modifier/"
-    readonly property string w: "file:///home/kat/Sources/RM2-kernel/Athena-kernel/mmcblk2p4/root/.xochitlPlugins/.common/icons/weather/"
+    readonly property string a: AthenaHook.pluginsPath+"/.common/icons/applications/"
+    readonly property string e: AthenaHook.pluginsPath+"/.common/icons/empty/"
+    readonly property string b: AthenaHook.pluginsPath+"/.common/icons/border/"
+    readonly property string m: AthenaHook.pluginsPath+"/.common/icons/modifier/"
+    readonly property string w: AthenaHook.pluginsPath+"/.common/icons/weather/"
     
     readonly property var mime: {
         "image/\w*": "image",
