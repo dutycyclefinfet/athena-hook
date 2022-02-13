@@ -33,7 +33,7 @@ private:
             args << _sanitize(additonal_arg);
         }
 
-        process.start("opkg", args);
+        process.start("/opt/bin/opkg", args);
         process.waitForFinished(-1); //will wait forever until finished
 
         if (process.exitStatus() == QProcess::CrashExit) {

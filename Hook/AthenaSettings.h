@@ -79,7 +79,7 @@ public:
     
     // ZRAM
     int zRAM_get() {
-    QString buf;
+        QString buf;
         Utils::read(buf, athenaPath(s_zram_path), " ");
         m_zRAM = QString(buf).toInt();
         return m_zRAM;
