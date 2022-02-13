@@ -35,8 +35,8 @@ class AthenaSettings : public QObject
     
     int m_batteryLimit;
 private:
-    const char* athenaPath(const QString& path) {
-        return QString(sysInfo.athenaRoot + path).toStdString().c_str();
+    QString athenaPath(const QString& path) {
+        return sysInfo.athenaRoot + path;
     }
 public:
     // USB

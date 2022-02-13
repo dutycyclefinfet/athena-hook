@@ -34,18 +34,18 @@ class AthenaKernel : public QObject
     bool m_wasCrashed;
 
 private:
-    const char* athenaPath(const QString& path) {
-        return QString(sysInfo.athenaRoot + path).toStdString().c_str();
+    QString athenaPath(const QString& path) {
+        return sysInfo.athenaRoot + path;
     }
 public:
     // CPU Undervolt
     int cpuUndervolt_get() {
-        char buf[1024];
-        readlink(athenaPath(s_zero_sugar_dtb_path), buf, sizeof(buf));
-        for (auto name : s_cpuUndervolts_files) {
-            if (strcmp(buf, name.toStdString().c_str()) != -1) {
+        QString current_undervolt = QFile::symLinkTarget(athenaPath(s_zero_sugar_dtb_path));
+
+        for (const auto& name : s_cpuUndervolts_files) {
+            if (name == current_undervolt) {
                 m_cpuUndervolt = s_cpuUndervolts[s_cpuUndervolts_files.indexOf(name)];
-                
+
                 return m_cpuUndervolt;
             }
         }
@@ -54,8 +54,8 @@ public:
     void cpuUndervolt_set(int val) {
         int ix = s_cpuUndervolts.indexOf(val);
         if ((ix > 0) && (val != m_cpuUndervolt)) {
-            remove(athenaPath(s_zero_sugar_dtb_path));
-            symlink(s_cpuUndervolts_files.at(ix).toStdString().c_str(), athenaPath(s_zero_sugar_dtb_path));
+            QFile::remove(athenaPath(s_zero_sugar_dtb_path));
+            QFile::link(s_cpuUndervolts_files.at(ix), athenaPath(s_zero_sugar_dtb_path));
 
             emit cpuUndervolt_changed(val);
         }
@@ -82,14 +82,14 @@ public:
     
     // Wipe
     bool overlayWipe_get() {
-        m_overlayWipe = (access(athenaPath("wipe_me"), F_OK)==0);
+        m_overlayWipe = QFile::exists(athenaPath("wipe_me"));
         return m_overlayWipe;
     }
     void overlayWipe_set(bool val) {
         if (val) {
             Utils::write("", athenaPath("wipe_me"));
         } else {
-            remove(athenaPath("wipe_me"));
+            QFile::remove(athenaPath("wipe_me"));
         }
 
         emit overlayWipe_changed(val);
@@ -97,13 +97,13 @@ public:
     
     // Kdump
     bool wasCrashed_get() {
-        m_wasCrashed = (access(athenaPath(s_last_log_path), F_OK)==0);
+        m_wasCrashed = QFile::exists(athenaPath(s_last_log_path));
         
         return m_wasCrashed;
     }
     void wasCrashed_set(bool val) {
         if (!val) {
-            remove(athenaPath(s_last_log_path));
+            QFile::remove(athenaPath(s_last_log_path));
         }
 
         emit wasCrashed_changed(val);

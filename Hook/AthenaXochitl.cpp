@@ -50,6 +50,7 @@ void getSysInfo() {
     sysInfo.xochitlPluginsPath = "/home/root/.xochitlPlugins/";
     sysInfo.xochitlPluginsCommon = sysInfo.xochitlPluginsPath + ".common/";
 }
+
 int QGuiApplication::exec() {
     static const auto orig_fn = (int (*)())dlsym(RTLD_NEXT, "_ZN15QGuiApplication4execEv");
     getSysInfo();
