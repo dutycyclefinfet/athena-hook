@@ -12,7 +12,7 @@ Item {
     property var featured: {}
     property var themes: {}
     property var packages: []
-    property var installed: ["zshelf"]
+    property var installed: []
     property var upgradable: []
     property var packagesCache: {}
 
@@ -32,6 +32,7 @@ Item {
         property string active: cells[0]
         property var cells: ["Featured", "Themes", "Other", "Updates"]
         cellWidth: width/model.length
+        interactive: false
 
         model: cells
         delegate: Item {
@@ -116,7 +117,6 @@ Item {
     function activatePopup(name, defIcon, upgrade=false) {
         popup.packageName = name;
         popup.defIcon = defIcon;
-        popup.visible = (name != "") ? true : false;
         popup.upgrade = upgrade;
     }
     function showModal(text) {
@@ -136,6 +136,7 @@ Item {
         property string defIcon: ""
         property var images: []
         property bool upgrade: false
+        visible: (packageName != "")
         
         onDefIconChanged: {
             if (root.featured[popup.packageName]) {
