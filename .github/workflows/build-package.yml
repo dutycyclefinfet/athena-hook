@@ -31,8 +31,8 @@ jobs:
           VERSION_NAME: ${{ steps.version_name.outputs.SOURCE_TAG }}
         with: 
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "$VERSION_NAME"
+          automatic_release_tag: "${{ env.VERSION_NAME }}"
           prerelease: false
-          title: "Release $VERSION_NAME"
+          title: "Release ${{ env.VERSION_NAME }}"
           files: |
             PKGBUILD/dist/rmall/*.ipk
