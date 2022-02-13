@@ -175,7 +175,7 @@ Rectangle {
         running: false
         onTriggered: {
             root_grid.model.clear();
-            if (Array.isArray(root.appDatabase)) {
+            if (root.appDatabase.length != undefined) {
                 for (var ix in root_grid.appDatabase) {
                     root_grid.model.append({"icon": "", "name": root_grid.appDatabase[ix]});
                 }
