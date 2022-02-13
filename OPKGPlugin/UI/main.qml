@@ -6,7 +6,7 @@ import Athena 9.9
 
 Item {
     id: root
-    visible: parent.parent.index==11
+    visible: parent.parent.index==99
     anchors.fill: parent
 
     property var featured: {}
@@ -480,6 +480,7 @@ Item {
             var upgradable = AthenaOPKG.getUpgradable(); //system("opkg list-upgradable") | grep -oe '^[a-zA-Z0-9-]*'")
             root.upgradable = upgradable ? upgradable : [];
             showModal("");
+            running = false;
         }
     }
 }
