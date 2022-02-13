@@ -1,2 +1,2 @@
-PKGBUILD/build
-PKGBUILD/dist
+PKGBUILD/
+!PKGBUILD/package
