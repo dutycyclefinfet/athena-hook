@@ -6,7 +6,6 @@ Item {
     property string suffix: ""
     property string title: ""
     property int value: 0
-    property int greyOut: 0
     property bool enabled: true
     property bool alwaysShowSign: false
     
@@ -35,7 +34,7 @@ Item {
             right: parent.right
             rightMargin: 145
         }
-        text: ((root.alwaysShowSign && slider.value > 0) ? "+" : "") + slider.value + root.suffix
+        text: ((root.alwaysShowSign && root.value > 0) ? "+" : "") + root.value + root.suffix
         font.bold: true
         font.pixelSize: 28
         horizontalAlignment: Text.AlignRight
