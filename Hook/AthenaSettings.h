@@ -47,11 +47,11 @@ public:
         return m_usbModes;
     };
     QString usbMode_get() {
-        Utils::read(m_usbMode, athenaPath(s_usb_modes_path), " ");
+        Utils::read(m_usbMode, athenaPath(s_usb_path), " ");
         return m_usbMode;
     }
     void usbMode_set(QString val) {
-        Utils::write(val, athenaPath(s_usb_modes_path));
+        Utils::write(val, athenaPath(s_usb_path));
         if ((m_usbMode != usbMode_get()) && sysInfo.athenaIsRunning) {
             system("systemctl restart athena-usb-daemon");
         }
@@ -81,11 +81,11 @@ public:
     int zRAM_get() {
         QString buf;
         Utils::read(buf, athenaPath(s_zram_path), " ");
-        m_zRAM = QString(buf).toInt();
+        m_zRAM = buf.toInt();
         return m_zRAM;
     }
     void zRAM_set(int val) {
-        Utils::write(QString(val), athenaPath(s_zram_path));
+        Utils::write(QString::number(val), athenaPath(s_zram_path));
 
         emit zRAM_changed(val);
     }
