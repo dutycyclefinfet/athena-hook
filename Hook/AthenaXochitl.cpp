@@ -7,6 +7,7 @@
 #include <QQuickWindow>
 
 #include <dlfcn.h>
+#include <stdlib.h>
 #include "AthenaBase.h"
 #include "AthenaSettings.h"
 #include "AthenaKernel.h"
@@ -41,6 +42,9 @@ const char hook_athena_stock[] =
 
 int QGuiApplication::exec() {
     static const auto orig_fn = (int (*)())dlsym(RTLD_NEXT, "_ZN15QGuiApplication4execEv");
+    setenv("QML_XHR_ALLOW_FILE_READ", "1", 1);
+    setenv("QML_XHR_ALLOW_FILE_WRITE", "1", 1);
+    unsetenv("LD_PRELOAD");
     AthenaBase::init();
 
     auto app = static_cast<QGuiApplication*>(QGuiApplication::instance());

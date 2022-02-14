@@ -20,7 +20,7 @@ private:
     }
 
     static bool _isAthenaRunning() {
-        return (system("uname -a | grep athena")==0);
+        return (system("uname -a | grep athena 1>/dev/null 2>/dev/null")==0);
     }
 
 protected:
