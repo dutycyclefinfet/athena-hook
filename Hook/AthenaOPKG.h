@@ -1,14 +1,8 @@
 #ifndef __ATHENAOPKG_H__
 #define __ATHENAOPKG_H__
 
-#include <QProcess>
 #include <QObject>
-#include <QVariant>
-#include <QFile>
-#include <QTextStream>
 #include "AthenaBase.h"
-#include <stdio.h>
-#include <unistd.h>
 
 class AthenaOPKG : public QObject, public AthenaBase
 {

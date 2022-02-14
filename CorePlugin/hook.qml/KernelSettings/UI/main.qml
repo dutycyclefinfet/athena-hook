@@ -103,7 +103,7 @@ Item {
                 suffix: qsTr("mV")
                 from: -100
                 stepSize: 25
-                to: 100
+                to: 75
                 greyOut: 0
                 alwaysShowSign: true
                 

@@ -2,7 +2,8 @@
 #define __ATHENASETTINGS_H__
 
 #include <QObject>
-#include <QVariant>
+#include <QString>
+#include <QStringList>
 #include "AthenaBase.h"
 
 class AthenaSettings : public QObject, public AthenaBase

@@ -2,9 +2,6 @@
 #define __ATHENAKERNEL_H__
 
 #include <QObject>
-#include <QVariant>
-#include <stdio.h>
-#include <unistd.h>
 #include "AthenaBase.h"
 #include "Utils.h"
 
@@ -53,7 +50,7 @@ private:
 public:
     // CPU Undervolt
     int cpuUndervolt_get() {
-        QString current_undervolt = QFile::symLinkTarget(athenaPath(s_zero_sugar_dtb_path));
+        QString current_undervolt = Utils::readLink(athenaPath(s_zero_sugar_dtb_path));
 
         for (const auto& name : s_cpuUndervolts_files) {
             if (name == current_undervolt) {
@@ -68,7 +65,7 @@ public:
         int ix = s_cpuUndervolts.indexOf(val);
         if ((ix > 0) && (val != m_cpuUndervolt)) {
             QFile::remove(athenaPath(s_zero_sugar_dtb_path));
-            QFile::link(s_cpuUndervolts_files.at(ix), athenaPath(s_zero_sugar_dtb_path));
+            Utils::symLink(s_cpuUndervolts_files.at(ix), athenaPath(s_zero_sugar_dtb_path));
 
             emit cpuUndervolt_changed(val);
         }

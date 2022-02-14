@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include <QString>
 #include <filesystem>
+#include <unistd.h>
 
 class Utils {
 public:
@@ -49,6 +50,16 @@ public:
             }
         }
         return l;
+    }
+
+    static QString readLink(const QString& path) {
+        char buf[1024];
+        readlink(path.toStdString().c_str(), buf, sizeof(buf));
+        return QString::fromLocal8Bit(buf);
+    }
+
+    static int symLink(const QString &fromPath, const QString &toPath) {
+        return symlink(fromPath.toStdString().c_str(), toPath.toStdString().c_str());
     }
 };
 

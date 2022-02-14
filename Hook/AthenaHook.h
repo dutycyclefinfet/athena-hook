@@ -2,6 +2,7 @@
 #define __ATHENAHOOK_H__
 
 #include <QObject>
+#include <QString>
 #include <QStringList>
 #include <QFile>
 #include <QCryptographicHash>
