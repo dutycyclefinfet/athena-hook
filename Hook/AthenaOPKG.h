@@ -6,45 +6,16 @@
 #include <QVariant>
 #include <QFile>
 #include <QTextStream>
+#include "AthenaBase.h"
 #include <stdio.h>
 #include <unistd.h>
 
-struct QProcessRet {
-    QString std;
-    int err;
-    int status;
-};
-class AthenaOPKG : public QObject
+class AthenaOPKG : public QObject, public AthenaBase
 {
     Q_OBJECT
 private:
-    QString _sanitize(QString name) {
-        return name;
-    }
-
-    QProcessRet _opkg(const QString& cmd, const QString additonal_arg = "") {
-        QProcessRet ret;
-        QProcess process;
-        QStringList args;
-
-        args << _sanitize(cmd);
-
-        if (additonal_arg != "") {
-            args << _sanitize(additonal_arg);
-        }
-
-        process.start("/opt/bin/opkg", args);
-        process.waitForFinished(-1); //will wait forever until finished
-
-        if (process.exitStatus() == QProcess::CrashExit) {
-            ret.status = process.error();
-        } else {
-            ret.status = 0;
-        }
-        ret.err = process.exitCode();
-        ret.std = process.readAllStandardOutput();
-
-        return ret;
+    QProcessRet _opkg(const QString& cmd, const QString additional_arg = "") {
+        return runProcess("/opt/bin/opkg", cmd, additional_arg);
     }
 
     QStringList _pkgOutputToList(const QString &output) {

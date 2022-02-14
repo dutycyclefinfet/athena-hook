@@ -7,11 +7,10 @@
 #include <QCryptographicHash>
 #include <QProcessEnvironment>
 #include <QQuickItem>
-#include <filesystem>
-#include <string>
+#include "AthenaBase.h"
 #include "Utils.h"
 
-class AthenaHook : public QObject
+class AthenaHook : public QObject, public AthenaBase
 {
     Q_OBJECT
     
@@ -27,43 +26,33 @@ class AthenaHook : public QObject
     QStringList m_pluginList;
     QStringList m_hashList;
     QString m_hash;
-private:
-    QStringList listDir(QString path) {
-        m_pluginList.clear();
-        for (const auto & entry : std::filesystem::directory_iterator(path.toStdString())) {
-            std::string name = entry.path().filename();
-            if (name[0] != '.') {
-                m_pluginList << QString::fromStdString(name);
-            }
-        }
-        return m_pluginList;
-    }
+
 public:
-    Q_INVOKABLE QString env(QString name) {
+    Q_INVOKABLE QString env(const QString& name) {
         return QProcessEnvironment::systemEnvironment().value(name);
     };
     QQuickItem* rootItem_get() {
         return m_rootItem;
     };
     QString rootPrefix_get() {
-        m_rootPrefix = sysInfo.athenaRoot;
+        m_rootPrefix = AthenaBase::athenaRoot();
         
         return m_rootPrefix;
     };
     QStringList pluginList_get() {
-        m_pluginList = listDir(sysInfo.xochitlPluginsPath);
+        m_pluginList = Utils::listDir(AthenaBase::xochitlPluginsPath());
         
         return m_pluginList;
     };
     QString pluginPath_get() {
-        return sysInfo.xochitlPluginsPath;
+        return AthenaBase::xochitlPluginsPath();
     };
     QStringList pluginHashList_get() {
         pluginList_get();
         
         m_hashList.clear();
-        for (const QString& plugin : m_pluginList) {
-            QFile file(sysInfo.xochitlPluginsPath + "/" + plugin + "/manifest.json");
+        for (const auto& plugin : m_pluginList) {
+            QFile file(AthenaBase::xochitlPluginsPath() + "/" + plugin + "/manifest.json");
             if (file.open(QIODevice::ReadOnly)) {
                 m_hashList << QCryptographicHash::hash(file.readAll(), QCryptographicHash::Md5).toHex();
             }
@@ -74,7 +63,7 @@ public:
         pluginHashList_get();
         
         QString hash;
-        for (const QString& fHash : m_hashList) {
+        for (const auto& fHash : m_hashList) {
             hash.append(fHash);
         }
         m_hash = QCryptographicHash::hash(hash.toLocal8Bit(), QCryptographicHash::Md5).toHex();

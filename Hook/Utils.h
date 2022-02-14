@@ -4,14 +4,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QString>
-
-struct SystemInfo {
-    QString xochitlPluginsCommon;
-    QString xochitlPluginsPath;
-    QString athenaRoot;
-    bool athenaIsRunning;
-};
-extern SystemInfo sysInfo;
+#include <filesystem>
 
 class Utils {
 public:
@@ -45,6 +38,17 @@ public:
         
         QTextStream out(&file);
         out << data;
+    }
+
+    static QStringList listDir(const QString& path) {
+        QStringList l;
+        for (const auto & entry : std::filesystem::directory_iterator(path.toStdString())) {
+            const std::string name = entry.path().filename();
+            if (name[0] != '.') {
+                l << QString::fromStdString(name);
+            }
+        }
+        return l;
     }
 };
 

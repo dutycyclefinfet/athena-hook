@@ -7,12 +7,12 @@
 #include <QQuickWindow>
 
 #include <dlfcn.h>
+#include "AthenaBase.h"
 #include "AthenaSettings.h"
 #include "AthenaKernel.h"
 #include "AthenaOPKG.h"
 #include "AthenaHook.h"
 #include "EventHook.h"
-#include "Utils.h"
 
 const char hook_athena[] = 
 "import QtQuick 2.0\n"
@@ -38,22 +38,10 @@ const char hook_athena_stock[] =
 "    }\n"
 "    source: \"file:///home/.rootdir/usr/libexec/athenaXochitl/hook.qml\"\n"
 "}";
-SystemInfo sysInfo;
-
-void getSysInfo() {
-    sysInfo.athenaIsRunning = (system("uname -a | grep athena")==0);
-    if (sysInfo.athenaIsRunning) {
-        sysInfo.athenaRoot = "/";
-    } else {
-        sysInfo.athenaRoot = "/home/.rootdir/";
-    }
-    sysInfo.xochitlPluginsPath = "/home/root/.xochitlPlugins/";
-    sysInfo.xochitlPluginsCommon = sysInfo.xochitlPluginsPath + ".common/";
-}
 
 int QGuiApplication::exec() {
     static const auto orig_fn = (int (*)())dlsym(RTLD_NEXT, "_ZN15QGuiApplication4execEv");
-    getSysInfo();
+    AthenaBase::init();
 
     auto app = static_cast<QGuiApplication*>(QGuiApplication::instance());
     auto windows = app->allWindows();
@@ -63,7 +51,7 @@ int QGuiApplication::exec() {
 
     if (e != nullptr) {
         QQmlComponent component(e);
-        component.setData(sysInfo.athenaIsRunning ? hook_athena : hook_athena_stock, QUrl("/AthenaXochitl.cpp"));
+        component.setData(AthenaBase::isAthenaRunning() ? hook_athena : hook_athena_stock, QUrl("/AthenaXochitl.cpp"));
         auto hookItem = qobject_cast<QQuickItem*>(component.create());
         auto evHook = new EventHook(hookItem);
 
@@ -75,7 +63,7 @@ int QGuiApplication::exec() {
         c->installEventFilter(evHook);
         hookItem->setParentItem(c);
         
-        e->addImportPath(sysInfo.xochitlPluginsCommon);
+        e->addImportPath(AthenaBase::xochitlPluginsCommon());
         auto root = e->rootContext();
         root->setContextProperty("AthenaHook", athenaHook);
         root->setContextProperty("AthenaOPKG", athenaOPKG);

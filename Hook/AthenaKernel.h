@@ -5,9 +5,10 @@
 #include <QVariant>
 #include <stdio.h>
 #include <unistd.h>
+#include "AthenaBase.h"
 #include "Utils.h"
 
-class AthenaKernel : public QObject
+class AthenaKernel : public QObject, public AthenaBase
 {
     Q_OBJECT
     // CPU voltage
@@ -23,7 +24,7 @@ class AthenaKernel : public QObject
         "dtb/zero-sugar_-100mV.dtb", "dtb/zero-sugar_-75mV.dtb", "dtb/zero-sugar_-50mV.dtb",
         "dtb/zero-sugar_-25mV.dtb", "dtb/zero-sugar_0mV.dtb", "dtb/zero-sugar_25mV.dtb",
         "dtb/zero-sugar_50mV.dtb", "dtb/zero-sugar_75mV.dtb"};
-    QString s_zero_sugar_dtb_path = "boot/athena/zero-sugar.dtb";
+    QString s_zero_sugar_dtb_path = "boot/zero-sugar.dtb";
     QString s_last_log_path = "var/log/kdump/last_log_name";
     
     int m_cpuUndervolt;
@@ -34,8 +35,20 @@ class AthenaKernel : public QObject
     bool m_wasCrashed;
 
 private:
-    QString athenaPath(const QString& path) {
-        return sysInfo.athenaRoot + path;
+    bool _isAthenaBoot() {
+        // auto process = runProcess("/sbin/fw_printenv", "athena_fail");
+
+        return (system("fw_printenv athena_fail | grep athena_fail=0 1>/dev/null 2>/dev/null")==0);
+    }
+
+    void _setAthenaBoot(bool boot) {
+        // QString val = boot? "0" : "1";
+        // runProcess("/sbin/fw_setenv", "athena_fail", val);
+        if (boot) {
+            system("fw_setenv athena_fail 0");
+        } else {
+            system("fw_setenv athena_fail 1");
+        }
     }
 public:
     // CPU Undervolt
@@ -63,21 +76,17 @@ public:
     
     // Bootloader
     bool bootAthena_get() {
-        m_bootAthena = (system("fw_printenv athena_fail | grep athena_fail=0 1>/dev/null 2>/dev/null")==0);
+        m_bootAthena = _isAthenaBoot();
         
         return m_bootAthena;
     }
     void bootAthena_set(bool val) {
-        if (val) {
-            system("fw_setenv athena_fail 0");
-        } else {
-            system("fw_setenv athena_fail 1");
-        }
+        _setAthenaBoot(val);
 
         emit bootAthena_changed(val);
     }
     bool isAthena_get() {
-        return sysInfo.athenaIsRunning;
+        return AthenaBase::isAthenaRunning();
     }
     
     // Wipe
