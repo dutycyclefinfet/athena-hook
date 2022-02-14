@@ -54,8 +54,13 @@ public:
 
     static QString readLink(const QString& path) {
         char buf[1024];
-        readlink(path.toStdString().c_str(), buf, sizeof(buf));
-        return QString::fromLocal8Bit(buf);
+        auto written = readlink(path.toStdString().c_str(), buf, sizeof(buf)-1);
+        if (written > 0) {
+            buf[written] = '\0';
+            return QString::fromLocal8Bit(buf);
+        } else {
+            return "";
+        }
     }
 
     static int symLink(const QString &fromPath, const QString &toPath) {
