@@ -9,17 +9,21 @@ Item {
     visible: parent.parent.index==99
     anchors.fill: parent
 
-    property var featured: {}
-    property var themes: {}
+    property var featured: ({})
+    property var themes: ({})
     property var packages: []
     property var installed: []
     property var upgradable: []
-    property var packagesCache: {}
+    property var packagesCache: ({})
+ 
+    function refreshOPKG() {
+        root_delay.running = true;
+    }
 
     onVisibleChanged: {
         if (visible) {
             showModal("Preparing package manager...\nPlease wait...")
-            root_delay.running = true;
+            refreshOPKG();
         }
     }
 
@@ -148,7 +152,7 @@ Item {
         }
         onPackageNameChanged: {
             if (popup.packageName) {
-                installed = (root.installed.indexOf(popup.packageName)!=-1)
+                installed = (root.installed.indexOf(popup.packageName)!=-1);
                 if (root.featured[popup.packageName]) {
                     packageDescription = root.featured[popup.packageName]["description"];
                     popup_carousel.images = root.featured[popup.packageName]["images"];
@@ -177,6 +181,7 @@ Item {
                         root.packagesCache[popup.packageName] = dct;
                     }
                     packageDescription = root.packagesCache[popup.packageName]["description"];
+                    showModal("");
                 }
             }
         }
@@ -300,6 +305,7 @@ Item {
                                 if (err) {
                                     showModal("Failed to install " + popup.packageName + "!\n" + err);
                                 } else {
+                                    refreshOPKG();
                                     showModal("Installation successful.");
                                 }
                             }
@@ -333,6 +339,7 @@ Item {
                                 if (err) {
                                     showModal("Failed to remove " + popup.packageName + "!\n" + err);
                                 } else {
+                                    refreshOPKG();
                                     showModal("Removal successful.");
                                 }
                             }

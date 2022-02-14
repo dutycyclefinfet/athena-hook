@@ -29,7 +29,7 @@ private:
 
         args << _sanitize(cmd);
 
-        if(additonal_arg != "") {
+        if (additonal_arg != "") {
             args << _sanitize(additonal_arg);
         }
 
