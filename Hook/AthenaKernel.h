@@ -8,23 +8,32 @@
 class AthenaKernel : public QObject, public AthenaBase
 {
     Q_OBJECT
-    // CPU voltage
+    // CPU
     Q_PROPERTY(int cpuUndervolt READ cpuUndervolt_get WRITE cpuUndervolt_set NOTIFY cpuUndervolt_changed);
+    Q_PROPERTY(int cpuCurrentVoltage READ cpuCurrentVoltage_get NOTIFY cpuCurrentVoltage_changed);
+    Q_PROPERTY(int cpu0Frequency READ cpu0Frequency_get NOTIFY cpu0Frequency_changed);
+    Q_PROPERTY(int cpu1Frequency READ cpu1Frequency_get NOTIFY cpu1Frequency_changed);
     // Kernel
     Q_PROPERTY(bool bootAthena READ bootAthena_get WRITE bootAthena_set NOTIFY bootAthena_changed);
     Q_PROPERTY(bool overlayWipe READ overlayWipe_get WRITE overlayWipe_set NOTIFY overlayWipe_changed);
     Q_PROPERTY(bool isAthena READ isAthena_get CONSTANT);
     Q_PROPERTY(bool wasCrashed READ wasCrashed_get CONSTANT);
 
-    QList<int> s_cpuUndervolts = {-100, -75, -50, -25, 0, 25, 50, 75};
-    QStringList s_cpuUndervolts_files = {
+    const QList<int> s_cpuUndervolts = {-100, -75, -50, -25, 0, 25, 50, 75};
+    const QStringList s_cpuUndervolts_files = {
         "dtb/zero-sugar_-100mV.dtb", "dtb/zero-sugar_-75mV.dtb", "dtb/zero-sugar_-50mV.dtb",
         "dtb/zero-sugar_-25mV.dtb", "dtb/zero-sugar_0mV.dtb", "dtb/zero-sugar_25mV.dtb",
         "dtb/zero-sugar_50mV.dtb", "dtb/zero-sugar_75mV.dtb"};
-    QString s_zero_sugar_dtb_path = "boot/zero-sugar.dtb";
-    QString s_last_log_path = "var/log/kdump/last_log_name";
+    const QString s_zero_sugar_dtb_path = "boot/zero-sugar.dtb";
+    const QString s_last_log_path = "var/log/kdump/last_log_name";
+    const QString s_current_cpu_voltage_path = "/sys/class/regulator/regulator.9/microvolts";
+    const QString s_current_cpu0_frequency_path = "/sys/bus/cpu/devices/cpu0/cpufreq/cpuinfo_cur_freq";
+    const QString s_current_cpu1_frequency_path = "/sys/bus/cpu/devices/cpu1/cpufreq/cpuinfo_cur_freq";
     
     int m_cpuUndervolt;
+    int m_cpuVoltage;
+    int m_cpu0Frequency;
+    int m_cpu1Frequency;
     
     bool m_bootAthena;
     bool m_overlayWipe;
@@ -48,7 +57,7 @@ private:
         }
     }
 public:
-    // CPU Undervolt
+    // CPU
     int cpuUndervolt_get() {
         QString current_undervolt = Utils::readLink(athenaPath(s_zero_sugar_dtb_path));
 
@@ -69,6 +78,27 @@ public:
 
             emit cpuUndervolt_changed(val);
         }
+    }
+
+    int cpuCurrentVoltage_get() {
+        QString buf;
+        Utils::read(buf, s_current_cpu_voltage_path, " ");
+        m_cpuVoltage = buf.toInt();
+        return m_cpuVoltage;
+    }
+
+    int cpu0Frequency_get() {
+        QString buf;
+        Utils::read(buf, s_current_cpu0_frequency_path, " ");
+        m_cpu0Frequency = buf.toInt();
+        return m_cpu0Frequency;
+    }
+
+    int cpu1Frequency_get() {
+        QString buf;
+        Utils::read(buf, s_current_cpu1_frequency_path, " ");
+        m_cpu1Frequency = buf.toInt();
+        return m_cpu1Frequency;
     }
     
     // Bootloader
@@ -119,6 +149,9 @@ public:
     }
 signals:
     void cpuUndervolt_changed(int);
+    void cpuCurrentVoltage_changed(int);
+    void cpu0Frequency_changed(int);
+    void cpu1Frequency_changed(int);
     void bootAthena_changed(bool);
     void overlayWipe_changed(bool);
     void wasCrashed_changed(bool);

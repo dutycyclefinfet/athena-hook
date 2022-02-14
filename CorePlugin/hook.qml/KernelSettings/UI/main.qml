@@ -85,6 +85,36 @@ Item {
             A.PanelDelimiter {
                 visible: AthenaKernel.isAthena
             }
+            A.InfoText {
+                id: currentVoltage_s
+                width: header.width
+                visible: AthenaKernel.isAthena
+                title: qsTr("Current voltage")
+                suffix: qsTr("mV")
+                alwaysShowSign: false
+                
+                value: Math.floor(AthenaKernel.cpuCurrentVoltage/1000)
+            }
+            A.InfoText {
+                id: cpu0Frequency_s
+                width: header.width
+                visible: AthenaKernel.isAthena
+                title: qsTr("Current CPU0 frequency")
+                suffix: qsTr("MHz")
+                alwaysShowSign: false
+                
+                value: Math.floor(AthenaKernel.cpu0Frequency/1000)
+            }
+            A.InfoText {
+                id: cpu1Frequency_s
+                width: header.width
+                visible: AthenaKernel.isAthena
+                title: qsTr("Current CPU1 frequency")
+                suffix: qsTr("MHz")
+                alwaysShowSign: false
+                
+                value: Math.floor(AthenaKernel.cpu1Frequency/1000)
+            }
             A.PanelDropdown {
                 id: governorCPU_s
                 width: header.width
