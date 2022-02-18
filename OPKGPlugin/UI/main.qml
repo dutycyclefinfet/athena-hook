@@ -1,7 +1,9 @@
 import QtQuick 2.6
 import QtQuick.Controls 2.4
-import "." as A
+import com.remarkable 1.0
+import common 1.0
 
+import "." as A
 import Athena 9.9
 
 Item {
@@ -11,15 +13,31 @@ Item {
 
     property var featured: ({})
     property var themes: ({})
-    property var packages: []
-    property var installed: []
-    property var upgradable: []
     property var packagesCache: ({})
+    
+    property var packages: AthenaOPKG.allPackages
+    property var installed: AthenaOPKG.installedPackages
+    property var upgradable: AthenaOPKG.upgradablePackages
+    
+    property string opkgState: AthenaOPKG.state;
  
     function refreshOPKG() {
         root_delay.running = true;
     }
-
+    onOpkgStateChanged: {
+        if (typeof(opkgState) == 'string' && opkgState!="") {
+            showModal(opkgState + "...\nPlease wait...");
+        }
+    }
+    onPackagesChanged: {
+        showModal("Available packages updated.\n ");
+    }
+    onInstalledChanged: {
+        showModal("Installed packages updated.\n ");
+    }
+    onUpgradableChanged: {
+        showModal("Upgradable packages updated.\n ");
+    }
     onVisibleChanged: {
         if (visible) {
             showModal("Preparing package manager...\nPlease wait...")
@@ -469,26 +487,18 @@ Item {
             return JSON.parse(x.responseText)
         }
         onTriggered: {
-            showModal("Downloading featured app list...\nPlease wait...");
-            var featured = downloadBlock("https://lonelytransistor.github.io/athena/featured.json");
-            root.featured = featured ? featured : {};
-            showModal("Downloading theme list...\nPlease wait...");
-            var themes = downloadBlock("https://lonelytransistor.github.io/athena/themes.json");
-            root.themes = themes ? themes : {};
+            if (WifiManager.enabled && WifiManager.isOnline) {
+                showModal("Downloading featured app list...\nPlease wait...");
+                var featured = downloadBlock("https://lonelytransistor.github.io/athena/featured.json");
+                root.featured = featured ? featured : {};
+                showModal("Downloading theme list...\nPlease wait...");
+                var themes = downloadBlock("https://lonelytransistor.github.io/athena/themes.json");
+                root.themes = themes ? themes : {};
             
-            showModal("Refreshing opkg repos...\nPlease wait...");
-            AthenaOPKG.update(); //system("opkg update")
-            showModal("Regenerating installed package list...\nPlease wait...");
-            var installed = AthenaOPKG.getInstalled(); //system("opkg list-installed \* | grep -oe '^[a-zA-Z0-9-]*'")
-            root.installed = installed ? installed : [];
-            showModal("Regenerating package list...\nPlease wait...");
-            var packages = AthenaOPKG.getPackages(); //system("opkg find \* | grep -oe '^[a-zA-Z0-9-]*'")
-            root.packages = packages ? packages : [];
-            showModal("Analyzing upgradability...\nPlease wait...");
-            var upgradable = AthenaOPKG.getUpgradable(); //system("opkg list-upgradable") | grep -oe '^[a-zA-Z0-9-]*'")
-            root.upgradable = upgradable ? upgradable : [];
-            showModal("");
-            running = false;
+                AthenaOPKG.update();
+            } else {
+                showModal("No internet connection detected.\nPlease retry when connected to the internet.");
+            }
         }
     }
 }

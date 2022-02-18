@@ -61,14 +61,6 @@ Item {
                 onPressed: AthenaSettings.encryptedRoot = !AthenaSettings.encryptedRoot
                 visible: false
             }
-            PanelToggle {
-                id: rootfsClear_s
-                width: header.width
-                icon: Icons.icon_trashcan
-                header: qsTr("Wipe overlayfs on next boot")
-                on: AthenaKernel.overlayWipe
-                onPressed: AthenaKernel.overlayWipe = !AthenaKernel.overlayWipe
-            }
             A.PanelDelimiter {
                 visible: AthenaKernel.isAthena
             }
@@ -86,12 +78,20 @@ Item {
                 visible: AthenaKernel.isAthena
             }
             A.InfoText {
+                id: screenVoltage_s
+                width: header.width
+                visible: AthenaKernel.isAthena
+                title: qsTr("EPD voltage")
+                suffix: qsTr("V")
+                
+                value: Math.floor(AthenaKernel.epdCurrentVoltage/1000)
+            }
+            A.InfoText {
                 id: currentVoltage_s
                 width: header.width
                 visible: AthenaKernel.isAthena
-                title: qsTr("Current voltage")
+                title: qsTr("CPU voltage")
                 suffix: qsTr("mV")
-                alwaysShowSign: false
                 
                 value: Math.floor(AthenaKernel.cpuCurrentVoltage/1000)
             }
@@ -99,21 +99,10 @@ Item {
                 id: cpu0Frequency_s
                 width: header.width
                 visible: AthenaKernel.isAthena
-                title: qsTr("Current CPU0 frequency")
+                title: qsTr("CPU frequency")
                 suffix: qsTr("MHz")
-                alwaysShowSign: false
                 
-                value: Math.floor(AthenaKernel.cpu0Frequency/1000)
-            }
-            A.InfoText {
-                id: cpu1Frequency_s
-                width: header.width
-                visible: AthenaKernel.isAthena
-                title: qsTr("Current CPU1 frequency")
-                suffix: qsTr("MHz")
-                alwaysShowSign: false
-                
-                value: Math.floor(AthenaKernel.cpu1Frequency/1000)
+                value: Math.floor(AthenaKernel.cpu0Frequency/1000) + ", " + Math.floor(AthenaKernel.cpu1Frequency/1000)
             }
             A.PanelDropdown {
                 id: governorCPU_s
@@ -124,6 +113,21 @@ Item {
                 activeIndex: AthenaSettings.cpuGovernors.indexOf(AthenaSettings.cpuGovernor)
                 onActiveIndexChanged: AthenaSettings.cpuGovernor = AthenaSettings.cpuGovernors[activeIndex]
                 z: 8
+            }
+            A.PanelSlider {
+                id: undervoltEPD_s
+                width: header.width
+                visible: AthenaKernel.isAthena
+                title: qsTr("Adjust EPD voltage by (has overvoltage protection):")
+                suffix: qsTr("mV")
+                from: -1000
+                stepSize: 10
+                to: 1000
+                greyOut: 0
+                alwaysShowSign: true
+                
+                value: AthenaKernel.epdAdjustmentVoltage
+                onDefaultSignal: AthenaKernel.epdAdjustmentVoltage = value;
             }
             A.PanelSlider {
                 id: undervoltCPU_s

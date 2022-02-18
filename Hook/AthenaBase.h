@@ -30,7 +30,7 @@ protected:
         int status;
     };
 
-    static QProcessRet runProcess(const QString& path, const QString& cmd, const QString additional_arg = "") {
+    static QProcessRet runProcess(const QString& path, const QString& cmd, const QString additional_arg = "", timeout=-1) {
         QProcessRet ret;
         QProcess process;
         QStringList args;
@@ -42,7 +42,7 @@ protected:
         }
 
         process.start(path, args);
-        process.waitForFinished(-1); //will wait forever until finished
+        process.waitForFinished(timeout); //will wait forever until finished
 
         if (process.exitStatus() == QProcess::CrashExit) {
             ret.status = process.error();

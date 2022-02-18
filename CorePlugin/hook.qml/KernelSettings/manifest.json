@@ -1,4 +1,5 @@
 [
+{"version": 1.0, "hookid": [["^Settings$","DUMP"],["Item",1],["^General$","DUMP"],["Column",0]], "name": "General", "type": "QML"},
 {"version": 1.0, "hookid": [["^Settings$","DUMP"],["Item",1]], "name": "UI", "type": "QML"},
 {"version": 1.0, "hookid": [["^Settings$","DUMP"],["Item",0],["Column",0]], "name": "Button", "type": "QML"}
 ]

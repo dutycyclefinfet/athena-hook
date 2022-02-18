@@ -7,6 +7,16 @@
 class AthenaOPKG : public QObject, public AthenaBase
 {
     Q_OBJECT
+    Q_PROPERTY(QStringList allPackages READ allPackages_get NOTIFY allPackages_changed);
+    Q_PROPERTY(QStringList installedPackages READ installedPackages_get NOTIFY installedPackages_changed);
+    Q_PROPERTY(QStringList upgradablePackages READ upgradablePackages_get NOTIFY upgradablePackages_changed);
+    Q_PROPERTY(QStringList state READ state_get NOTIFY state_changed);
+    
+    QStringList m_allPackages;
+    QStringList m_installedPackages;
+    QStringList m_upgradablePackages;
+    QString m_state;
+    
 private:
     QProcessRet _opkg(const QString& cmd, const QString additional_arg = "") {
         return runProcess("/opt/bin/opkg", cmd, additional_arg);
@@ -27,21 +37,39 @@ private:
         return result;
     }
 
-public:
-    Q_INVOKABLE QStringList getPackages() {
+    void _update() {
+        m_state = "Updating cache";
+        emit state_changed(m_state);
+        auto ret = _opkg("update");
+        
+        m_state = "Listing packages";
+        emit state_changed(m_state);
         auto ret = _opkg("find", "*");
-
-        return _pkgOutputToList(ret.std);
-    }
-    Q_INVOKABLE QStringList getInstalled() {
-        auto ret = _opkg("list-installed");
-
-        return _pkgOutputToList(ret.std);
-    }
-    Q_INVOKABLE QStringList getUpgradable() {
+        m_allPackages = _pkgOutputToList(ret.std);
+        emit installedPackages_changed(m_allPackages);
+        
+        m_state = "Listing upgradable packages";
+        emit state_changed(m_state);
         auto ret = _opkg("list-upgradable");
-
-        return _pkgOutputToList(ret.std);
+        m_upgradablePackages = _pkgOutputToList(ret.std);
+        emit installedPackages_changed(m_installedPackages);
+        
+        m_state = "Listing installed packages";
+        emit state_changed(m_state);
+        auto ret = _opkg("list-installed");
+        m_installedPackages = _pkgOutputToList(ret.std);
+        emit upgradablePackages_changed(m_upgradablePackages);
+        
+        m_state = "";
+        emit state_changed(m_state);
+    }
+public:
+    Q_INVOKABLE void update(bool blocking = false) {
+        if (blocking) {
+            _update();
+        } else {
+            QtConcurrent::run(&this->MyObject, AthenaOPKG::update, true);
+        }
     }
     Q_INVOKABLE QStringList getInfo(QString packageName) {
         auto ret = _opkg("info", packageName);
@@ -63,11 +91,10 @@ public:
         
         return (!ret.err && !ret.status) ? "" : ret.std;
     }
-    Q_INVOKABLE bool update() {
-        auto ret = _opkg("update");
-        
-        return (!ret.err && !ret.status);
-    }
+    
+    QStringList allPackages_get();
+    QStringList installedPackages_get();
+    QStringList upgradablePackages_get();
 };
 
 #endif //__ATHENAOPKG_H__
