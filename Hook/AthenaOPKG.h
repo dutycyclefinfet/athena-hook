@@ -101,9 +101,15 @@ public:
         return m_state;
     }
     
-    QStringList allPackages_get();
-    QStringList installedPackages_get();
-    QStringList upgradablePackages_get();
+    QStringList allPackages_get() {
+        return m_allPackages;
+    }
+    QStringList upgradablePackages_get() {
+        return m_upgradablePackages;
+    }
+    QStringList installedPackages_get() {
+        return m_installedPackages;
+    }
 signals:
     void allPackages_changed(QStringList);
     void installedPackages_changed(QStringList);

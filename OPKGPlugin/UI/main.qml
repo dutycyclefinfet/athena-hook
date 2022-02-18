@@ -1,7 +1,6 @@
 import QtQuick 2.6
 import QtQuick.Controls 2.4
 import com.remarkable 1.0
-import common 1.0
 
 import "." as A
 import Athena 9.9

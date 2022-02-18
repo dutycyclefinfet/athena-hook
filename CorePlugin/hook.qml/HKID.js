@@ -3,6 +3,22 @@
 function _getQMLObjectType(obj) {
     return obj.toString().replace(/\([0-9a-fx]+\)/g, "").replace(/_QML.*/g, "");
 }
+function _testQMLObjectType(rgxp, obj) {
+    let objType = _getQMLObjectType(obj);
+    if (rgxp.test(objType)) {
+        return 1;
+    }
+    if (objType == "QQuickLoader") {
+        if (obj.item !== null) {
+            let val = rgxp.test(_getQMLObjectType(obj.item));
+            if (val) {
+                return 2;
+            }
+        }
+    }
+    return 0;
+}
+
 /////////////////////////////////////////
 // Convert a list of compiled object chains into an array of Qt5 objects for injection
 /////////////////////////////////////////
@@ -20,19 +36,23 @@ function _execute(item, hkid_c) {
 /////////////////////////////////////////
 // Search for a single object chain
 /////////////////////////////////////////
-function _compileDump(item, tree, res, res_obj, re) {
+function _compileDump(item, tree, res, res_obj, hkid_tp) {
     for (var n=0; n<item.children.length; n+=1) {
         var child = item.children[n];
         
-        if (re.test(_getQMLObjectType(child))) {
+        if (_testQMLObjectType(hkid_tp, child) == 2) {
+            res.push([].concat(tree, [n, 0]));
+            res_obj.push(child.children[0]);
+        } else if (_testQMLObjectType(hkid_tp, child) == 1) {
             res.push([].concat(tree, n));
             res_obj.push(child);
         } else {
-            _compileDump(child, [].concat(tree, n), res, res_obj, re);
+            _compileDump(child, [].concat(tree, n), res, res_obj, hkid_tp);
         }
     }
 }
 function _compile(item, hkid) {
+    var hkid_c_last_length = 0;
     var hkid_c = [];   // Create an empty array of arrays, each subarray will have a set of results.
                        // This variable will always have a single subarray, because it only gets appended
                        // at the "fresh" execution i.e. not when inside if(hkid_ix=="ALL"). When "ALL" is
@@ -47,13 +67,18 @@ function _compile(item, hkid) {
             var hkid_c_nest = [];
             for (var n=0; n<item.children.length; n+=1) { // Gather all instances of the searched object and recursively rerun the hkid analysis
                 var child = item.children[n];
-                if (hkid_tp.test(_getQMLObjectType(child))) {
-                    // Copy the existing array, then push it with a copy of the recursion result. After looping over
-                    // all children we will return this array of arrays, because there is nothing more to be done.
-                    // Everything was already done deeper in the recursion and we are simply exiting upwards in the stack.
+                var hkid_c_glue = [n];
+                // Copy the existing array, then push it with a copy of the recursion result. After looping over
+                // all children we will return this array of arrays, because there is nothing more to be done.
+                // Everything was already done deeper in the recursion and we are simply exiting upwards in the stack.
+                if (_testQMLObjectType(hkid_tp, child) == 2) {
+                    child = child.children[0];
+                    hkid_c_glue.push(0);
+                }
+                if (_testQMLObjectType(hkid_tp, child) == 1) {
                     for (var hkid_c_rec of _compile(child, hkid.slice(i+1, hkid.length))) {
                         if (hkid_c_rec.length) {
-                            hkid_c_nest.push([].concat(hkid_c, [n], hkid_c_rec));
+                            hkid_c_nest.push([].concat(hkid_c, hkid_c_glue, hkid_c_rec));
                         }
                     }
                 }
@@ -80,18 +105,26 @@ function _compile(item, hkid) {
             var n_of_type = 0;
             for (var n=0; n<item.children.length; n+=1) {
                 var child = item.children[n];
-                if (hkid_tp.test(_getQMLObjectType(child))) {
+                if (_testQMLObjectType(hkid_tp, child)) {
                     if (hkid_ix == n_of_type) { // Is this the correct object hkid_ix-th of the type hkid_tp?
                         item = child;
                         hkid_c.push(n); // Push to the array of arrays, but first dereference it.
+                        
+                        if (_testQMLObjectType(hkid_tp, child) == 2) {
+                            hkid_c.push(0);
+                        }
                         break;
                     }
                     n_of_type++;
                 }
             }
         }
+        if (hkid_c.length <= hkid_c_last_length) {
+            return [];
+        }
+        hkid_c_last_length = hkid_c.length;
     }
-    return (hkid_c.length==hkid.length) ? [hkid_c] : [];
+    return [hkid_c];
 }
 /////////////////////////////////////////
 // Search for a single object chain

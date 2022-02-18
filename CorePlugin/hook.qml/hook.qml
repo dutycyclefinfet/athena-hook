@@ -93,13 +93,15 @@ Item {
             }
             
             var objs = HKID.execute(root.root_id, plugin["hookid"], plugin["hookid_c"]);
+            if (objs["hookid_c"][0].length == 0) {
+                return retVal.PLUGIN_INVALID_HOOKID;
+            }
+            
             plugin["hookid_c"] = objs["hookid_c"];
             objs = objs["objects"];
         } catch (error) {
             console.warn("Could not execute HOOKID=" + JSON.stringify(plugins["hookid"]) + "; HOOKIDc=" + JSON.stringify(plugins["hookid_c"]) + ". " + error);
         }
-        if (objs.length == 0)
-            return retVal.PLUGIN_INVALID_HOOKID;
         
         // Process payload
         while (objs.length > 0) {
@@ -122,7 +124,6 @@ Item {
     /////////////////////////////////////////
     function parsePlugins(plugins) {
         var ret = retVal.PLUGIN_SUCCESS;
-        
         for (var ix in plugins) {
             var plugin = plugins[ix];
             if (true) { //config[plugin["name"]]["enabled"] == true) { //FIXME
@@ -140,9 +141,7 @@ Item {
                             ret = retVal.PLUGIN_NO_SUCH_FILE;
                         }
                     } else {
-                        for (var subPlugin of plugin["cache"]) {
-                            ret = parsePlugins(subPlugin);
-                        }
+                        ret = parsePlugins(plugin["cache"]);
                     }
                 } else {
                     ret = loadPlugin(plugin);
