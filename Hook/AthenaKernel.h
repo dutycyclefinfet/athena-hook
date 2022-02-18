@@ -2,6 +2,8 @@
 #define __ATHENAKERNEL_H__
 
 #include <QObject>
+#include <QDir>
+#include <QFileInfo>
 #include "AthenaBase.h"
 #include "Utils.h"
 
@@ -62,9 +64,9 @@ private:
     void _getUndervolts() {
         if (s_cpuUndervolts.size() == 0) {
             QDir dtbDir(athenaPath(s_undervolt_dtb_dir));
-            QFileInfoList list = dir.entryInfoList();
-            for (int i = 0; i < list.size(); ++i) {
-                auto fName = fileInfo.fileName();
+            QFileInfoList fileInfo = dtbDir.entryInfoList();
+            for (int i = 0; i < fileInfo.size(); ++i) {
+                auto fName = fileInfo[i].fileName();
                 if (QRegExp("\\w+_-?[0-9]+\\.dtb").exactMatch(fName)) {
                     s_cpuUndervolts << fName.split(QRegExp("[_\\.]"),Qt::SkipEmptyParts).at(1).toInt();
                     s_cpuUndervolts_files << s_undervolt_dtb_link_prefix + fName;

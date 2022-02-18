@@ -1,4 +1,4 @@
-QT += qml quick gui
+QT += qml quick gui concurrent
 
 TEMPLATE = lib
 CONFIG += c++17

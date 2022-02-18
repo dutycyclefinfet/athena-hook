@@ -42,6 +42,7 @@ package() {
     _install -r -m 644 -D "${srcdir}/CorePlugin/common" "${pkgdir}/home/root/.xochitlPlugins/.common"
     
     _install -r -m 644 -D "${srcdir}/CorePlugin/hook.qml" "${pkgdir}/usr/libexec/athenaXochitl"
+    _install -m 644 -D "${srcdir}/Hook/adjust-epd.service" "${pkgdir}/lib/systemd/system/adjust-epd.service"
     _install -m 755 -D "${srcdir}/Hook/libAthenaXochitl.so.1.0.0" "${pkgdir}/usr/libexec/libAthenaXochitl.so"
     _install -m 755 -D "${srcdir}/Hook/athenaHelper.sh" "${pkgdir}/usr/libexec/athenaHelper"
     

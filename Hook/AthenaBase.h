@@ -30,7 +30,7 @@ protected:
         int status;
     };
 
-    static QProcessRet runProcess(const QString& path, const QString& cmd, const QString additional_arg = "", timeout=-1) {
+    static QProcessRet runProcess(const QString& path, const QString& cmd, const QString additional_arg = "", int timeout=-1) {
         QProcessRet ret;
         QProcess process;
         QStringList args;
