@@ -41,23 +41,23 @@ private:
     void _update() {
         QProcessRet ret;
         
-        m_state = "Updating cache";
+        m_state = "Updating cache...\nPlease wait...";
         emit state_changed(m_state);
         ret = _opkg("update");
         
-        m_state = "Listing packages";
+        m_state = "Listing packages\nPlease wait...";
         emit state_changed(m_state);
         ret = _opkg("find", "*");
         m_allPackages = _pkgOutputToList(ret.std);
-        emit installedPackages_changed(m_allPackages);
+        emit allPackages_changed(m_allPackages);
         
-        m_state = "Listing upgradable packages";
+        m_state = "Listing upgradable packages\nPlease wait...";
         emit state_changed(m_state);
         ret = _opkg("list-upgradable");
         m_upgradablePackages = _pkgOutputToList(ret.std);
         emit installedPackages_changed(m_installedPackages);
         
-        m_state = "Listing installed packages";
+        m_state = "Listing installed packages\nPlease wait...";
         emit state_changed(m_state);
         ret = _opkg("list-installed");
         m_installedPackages = _pkgOutputToList(ret.std);
@@ -66,41 +66,70 @@ private:
         m_state = "";
         emit state_changed(m_state);
     }
-public:
-    Q_INVOKABLE void update(bool blocking = false) {
-        if (blocking) {
-            _update();
+    void _upgrade(QString packageName) {
+        QProcessRet ret;
+        
+        m_state << "Upgrading " << packageName << "...\nPlease wait...";
+        emit state_changed(m_state);
+        ret = _opkg("upgrade", packageName);
+        
+        if (!ret.err && !ret.status) {
+            m_state << "Upgraded " << packageName << "!";
         } else {
-            QtConcurrent::run([=]() {
-                update(true);
-            });
+            m_state << "Error while upgrading " << packageName << "!\n" << ret.std;
         }
+        emit state_changed(m_state);
+    }
+    void _install(QString packageName) {
+        QProcessRet ret;
+        
+        m_state << "Installing " << packageName << "...\nPlease wait...";
+        emit state_changed(m_state);
+        ret = _opkg("install", packageName);
+        
+        if (!ret.err && !ret.status) {
+            m_state << "Installed " << packageName << "!";
+        } else {
+            m_state << "Error while installing " << packageName << "!\n" << ret.std;
+        }
+        emit state_changed(m_state);
+    }
+    void _remove(QString packageName) {
+        QProcessRet ret;
+        
+        m_state << "Removing " << packageName << "...\nPlease wait...";
+        emit state_changed(m_state);
+        ret = _opkg("remove", packageName);
+        
+        if (!ret.err && !ret.status) {
+            m_state << "Removed " << packageName << "!";
+        } else {
+            m_state << "Error while removing " << packageName << "!\n" << ret.std;
+        }
+        emit state_changed(m_state);
+    }
+public:
+    Q_INVOKABLE void update() {
+        QtConcurrent::run([&]() {_update();});
+    }
+    Q_INVOKABLE void upgrade(QString packageName) {
+        QtConcurrent::run([&]() {_upgrade(packageName);});
+    }
+    Q_INVOKABLE QString install(QString packageName) {
+        QtConcurrent::run([&]() {_install(packageName);});
+    }
+    Q_INVOKABLE QString remove(QString packageName) {
+        QtConcurrent::run([&]() {_remove(packageName);});
     }
     Q_INVOKABLE QStringList getInfo(QString packageName) {
         auto ret = _opkg("info", packageName);
         
         return ret.std.split(QRegExp("[\r\n]"),Qt::SkipEmptyParts);
     }
-    Q_INVOKABLE QString upgrade(QString packageName) {
-        auto ret = _opkg("upgrade", packageName);
-        
-        return (!ret.err && !ret.status) ? "" : ret.std;
-    }
-    Q_INVOKABLE QString install(QString packageName) {
-        auto ret = _opkg("install", packageName);
-        
-        return (!ret.err && !ret.status) ? "" : ret.std;
-    }
-    Q_INVOKABLE QString remove(QString packageName) {
-        auto ret = _opkg("remove", packageName);
-        
-        return (!ret.err && !ret.status) ? "" : ret.std;
-    }
     
     QString state_get() {
         return m_state;
     }
-    
     QStringList allPackages_get() {
         return m_allPackages;
     }

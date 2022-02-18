@@ -119,7 +119,7 @@ public:
 
     int epdAdjustmentVoltage_get() {
         QString buf;
-        Utils::read(buf, s_epd_vadj_path, "0");
+        Utils::read(buf, s_epd_vadj_path, " ");
         
         m_epdAdjVoltage = buf.toInt();
         return m_epdAdjVoltage;
@@ -133,7 +133,7 @@ public:
 
     int epdCurrentVoltage_get() {
         QString buf;
-        Utils::read(buf, s_current_epd_voltage_path, "0");
+        Utils::read(buf, s_current_epd_voltage_path, " ");
         
         m_epdVoltage = -buf.toInt();
         return m_epdVoltage;
@@ -141,21 +141,21 @@ public:
     
     int cpuCurrentVoltage_get() {
         QString buf;
-        Utils::read(buf, s_current_cpu_voltage_path, "0");
+        Utils::read(buf, s_current_cpu_voltage_path, " ");
         m_cpuVoltage = buf.toInt();
         return m_cpuVoltage;
     }
 
     int cpu0Frequency_get() {
         QString buf;
-        Utils::read(buf, s_current_cpu0_frequency_path, "0");
+        Utils::read(buf, s_current_cpu0_frequency_path, " ");
         m_cpu0Frequency = buf.toInt();
         return m_cpu0Frequency;
     }
 
     int cpu1Frequency_get() {
         QString buf;
-        Utils::read(buf, s_current_cpu1_frequency_path, "0");
+        Utils::read(buf, s_current_cpu1_frequency_path, " ");
         m_cpu1Frequency = buf.toInt();
         return m_cpu1Frequency;
     }

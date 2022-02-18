@@ -25,7 +25,7 @@ Item {
     }
     onOpkgStateChanged: {
         if (typeof(opkgState) == 'string' && opkgState!="") {
-            showModal(opkgState + "...\nPlease wait...");
+            showModal(opkgState);
         }
     }
     onPackagesChanged: {
