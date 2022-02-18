@@ -2,7 +2,7 @@
 
 pkgnames=(athena-hook)
 url="https://github.com/dutycyclefinfet/athena-hook"
-pkgver=$(cat version)
+pkgver=$(<version)
 timestamp=$(date +"%Y-%m-%dT%H:%M:%S%z")
 pkgdesc="Athena hook"
 section="utils"
