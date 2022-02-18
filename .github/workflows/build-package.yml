@@ -24,7 +24,10 @@ jobs:
       - name: Build package
         env:
           VERSION_NAME: ${{ steps.version_name.outputs.SOURCE_TAG }}
-        run: cd PKGBUILD && echo $VERSION_NAME > version && toltecmk -v
+        run: |
+          cd PKGBUILD
+          echo $VERSION_NAME > version
+          toltecmk -v
       - name: Create Github release
         uses: marvinpinto/action-automatic-releases@latest
         env:
