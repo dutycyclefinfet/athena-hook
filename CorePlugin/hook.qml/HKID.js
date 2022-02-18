@@ -107,11 +107,12 @@ function _compile(item, hkid) {
                 var child = item.children[n];
                 if (_testQMLObjectType(hkid_tp, child)) {
                     if (hkid_ix == n_of_type) { // Is this the correct object hkid_ix-th of the type hkid_tp?
-                        item = child;
                         hkid_c.push(n); // Push to the array of arrays, but first dereference it.
-                        
                         if (_testQMLObjectType(hkid_tp, child) == 2) {
+                            item = child.children[0];
                             hkid_c.push(0);
+                        } else {
+                            item = child;
                         }
                         break;
                     }
