@@ -79,7 +79,7 @@ Item {
         }
         return retVal.PLUGIN_SUCCESS;
     }
-    function loadPROP(plugin, obj_id) {
+    function loadPluginPROP(plugin, obj_id) {
         for (var key in plugin["data"]) {
             obj_id[key] = plugin["data"][key];
         }
