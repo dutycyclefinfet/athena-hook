@@ -135,9 +135,9 @@ Item {
                 visible: AthenaKernel.isAthena
                 title: qsTr("Adjust CPU voltage by:")
                 suffix: qsTr("mV")
-                from: min(AthenaKernel.cpuUndervolts)
+                from: Math.min.apply(Math, AthenaKernel.cpuUndervolts)
                 stepSize: 25
-                to: max(AthenaKernel.cpuUndervolts)
+                to: Math.max.apply(Math, AthenaKernel.cpuUndervolts)
                 greyOut: 0
                 alwaysShowSign: true
                 
