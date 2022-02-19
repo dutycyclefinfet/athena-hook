@@ -32,7 +32,7 @@ class AthenaKernel : public QObject, public AthenaBase
     const QString s_last_log_path = "var/log/kdump/last_log_name";
     const QString s_current_cpu_voltage_path = "/sys/class/regulator/regulator.9/microvolts";
     const QString s_current_epd_voltage_path = "/sys/class/regulator/regulator.24/microvolts";
-    const QString s_epd_vadj_path = "/etc/athena/vadj";
+    const QString s_epd_vadj_path = "/etc/athena/epd";
     const QString s_current_cpu0_frequency_path = "/sys/bus/cpu/devices/cpu0/cpufreq/cpuinfo_cur_freq";
     const QString s_current_cpu1_frequency_path = "/sys/bus/cpu/devices/cpu1/cpufreq/cpuinfo_cur_freq";
     
@@ -119,7 +119,9 @@ public:
         return m_epdAdjVoltage;
     }
     void epdAdjustmentVoltage_set(int val) {
-        Utils::write(QString::number(val), s_epd_vadj_path);
+        if ((val>-500) && (val<500)) {
+            Utils::write(QString::number(val*1000), s_epd_vadj_path);
+        }
         
         emit epdAdjustmentVoltage_changed(epdAdjustmentVoltage_get());
         emit epdCurrentVoltage_changed(epdCurrentVoltage_get());
