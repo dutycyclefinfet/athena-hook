@@ -115,7 +115,7 @@ public:
         QString buf;
         Utils::read(buf, s_epd_vadj_path, " ");
         
-        m_epdAdjVoltage = buf.toInt();
+        m_epdAdjVoltage = buf.toInt()/1000;
         return m_epdAdjVoltage;
     }
     void epdAdjustmentVoltage_set(int val) {
