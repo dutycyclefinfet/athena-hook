@@ -75,16 +75,16 @@ public:
     
     Q_INVOKABLE int getFreeRAM() {
         if ((get_phys_pages() < get_avphys_pages()) || (sysconf(_SC_PAGESIZE)<=0)) {
-            return get_avphys_pages()*sysconf(_SC_PAGESIZE);
-        } else {
             return -1;
+        } else {
+            return get_avphys_pages()*sysconf(_SC_PAGESIZE);
         }
     }
     Q_INVOKABLE int getTotalRAM() {
         if ((get_phys_pages() < get_avphys_pages()) || (sysconf(_SC_PAGESIZE)<=0)) {
-            return get_phys_pages()*sysconf(_SC_PAGESIZE);
-        } else {
             return -1;
+        } else {
+            return get_phys_pages()*sysconf(_SC_PAGESIZE);
         }
     }
     
