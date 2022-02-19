@@ -10,10 +10,8 @@ import "." as A
 Row {
     id: root
     
-    property Item existingButtons: parent.parent.children[parent.parent.children.indexOf(parent.parent)];
-    
     anchors.bottom: parent.bottom
-    anchors.bottomMargin: 200
+    anchors.bottomMargin: 400
     anchors.horizontalCenter: parent.horizontalCenter
     spacing: Values.designGridVerticalWidth
 
@@ -21,9 +19,7 @@ Row {
         id: restartXochitlButton
         text: qsTr("Restart Xochitl")
         iconCode: Icons.icon_restore
-        onClicked: {
-            Qt.quit();
-        }
+        onClicked: AthenaHook.restartXochitl();
     }
 
     Button {

@@ -5,6 +5,7 @@
 #include <QString>
 #include <QStringList>
 #include "AthenaBase.h"
+#include <QDebug>
 
 class AthenaSettings : public QObject, public AthenaBase
 {

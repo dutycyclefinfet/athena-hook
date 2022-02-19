@@ -32,6 +32,9 @@ public:
     Q_INVOKABLE QString env(const QString& name) {
         return QProcessEnvironment::systemEnvironment().value(name);
     };
+    Q_INVOKABLE void restartXochitl() {
+        system("systemctl restart xochitl");
+    };
     QQuickItem* rootItem_get() {
         return m_rootItem;
     };

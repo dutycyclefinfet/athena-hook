@@ -7,6 +7,8 @@
 #include "AthenaBase.h"
 #include "Utils.h"
 
+#include <QDebug>
+
 class AthenaKernel : public QObject, public AthenaBase
 {
     Q_OBJECT
@@ -40,7 +42,7 @@ class AthenaKernel : public QObject, public AthenaBase
     const QString s_last_log_path = "var/log/kdump/last_log_name";
     const QString s_current_cpu_voltage_path = "/sys/class/regulator/regulator.9/microvolts";
     const QString s_current_epd_voltage_path = "/sys/class/regulator/regulator.24/microvolts";
-    const QString s_epd_vadj_path = "/sys/class/regulator/regulator.24/vadj";
+    const QString s_epd_vadj_path = "/etc/athena/vadj";
     const QString s_current_cpu0_frequency_path = "/sys/bus/cpu/devices/cpu0/cpufreq/cpuinfo_cur_freq";
     const QString s_current_cpu1_frequency_path = "/sys/bus/cpu/devices/cpu1/cpufreq/cpuinfo_cur_freq";
     
@@ -67,8 +69,10 @@ private:
             QFileInfoList fileInfo = dtbDir.entryInfoList();
             for (int i = 0; i < fileInfo.size(); ++i) {
                 auto fName = fileInfo[i].fileName();
-                if (QRegExp("\\w+_-?[0-9]+\\.dtb").exactMatch(fName)) {
-                    s_cpuUndervolts << fName.split(QRegExp("[_\\.]"),Qt::SkipEmptyParts).at(1).toInt();
+                const QRegExp match("\\w+_(-?[0-9]+)mV\\.dtb");
+                
+                if (match.exactMatch(fName)) {
+                    s_cpuUndervolts << match.cap(1).toInt();
                     s_cpuUndervolts_files << s_undervolt_dtb_link_prefix + fName;
                 }
             }

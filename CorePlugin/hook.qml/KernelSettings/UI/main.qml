@@ -82,7 +82,7 @@ Item {
                 width: header.width
                 visible: AthenaKernel.isAthena
                 title: qsTr("EPD voltage")
-                suffix: qsTr("V")
+                suffix: qsTr("mV")
                 
                 value: Math.floor(AthenaKernel.epdCurrentVoltage/1000)
             }
@@ -102,7 +102,7 @@ Item {
                 title: qsTr("CPU frequency")
                 suffix: qsTr("MHz")
                 
-                value: Math.floor(AthenaKernel.cpu0Frequency/1000) + ", " + Math.floor(AthenaKernel.cpu1Frequency/1000)
+                value: Math.floor(AthenaKernel.cpu0Frequency/1000) + "MHz, " + Math.floor(AthenaKernel.cpu1Frequency/1000)
             }
             A.PanelDropdown {
                 id: governorCPU_s
@@ -121,7 +121,7 @@ Item {
                 title: qsTr("Adjust EPD voltage by (has overvoltage protection):")
                 suffix: qsTr("mV")
                 from: -1000
-                stepSize: 10
+                stepSize: 100
                 to: 1000
                 greyOut: 0
                 alwaysShowSign: true
@@ -135,9 +135,9 @@ Item {
                 visible: AthenaKernel.isAthena
                 title: qsTr("Adjust CPU voltage by:")
                 suffix: qsTr("mV")
-                from: -100
+                from: min(AthenaKernel.cpuUndervolts)
                 stepSize: 25
-                to: 75
+                to: max(AthenaKernel.cpuUndervolts)
                 greyOut: 0
                 alwaysShowSign: true
                 

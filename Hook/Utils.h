@@ -17,7 +17,7 @@ public:
         
         QTextStream in(&file);
 
-        QString line = in.readLine();
+        QString line = in.readLine() + sep;
         output = line.split(sep, Qt::SkipEmptyParts);
     }
     static void read(QString &output, const QString &path, const QString &sep, const QString def = "") {
