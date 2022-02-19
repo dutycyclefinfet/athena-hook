@@ -88,7 +88,7 @@ Item {
         // Get injection point handle
         try {
             if (plugin["unhashable"] == true) {
-                console.info("Plugin " + plugin[name] + " is uncacheable due to security reasons.");
+                console.info("Plugin " + plugin["name"] + " is uncacheable due to security reasons.");
                 plugin["hookid_c"] = [];
             }
             
@@ -100,7 +100,7 @@ Item {
             plugin["hookid_c"] = objs["hookid_c"];
             objs = objs["objects"];
         } catch (error) {
-            console.warn("Could not execute HOOKID=" + JSON.stringify(plugins["hookid"]) + "; HOOKIDc=" + JSON.stringify(plugins["hookid_c"]) + ". " + error);
+            console.warn("Could not execute HOOKID=" + JSON.stringify(plugin["hookid"]) + "; HOOKIDc=" + JSON.stringify(plugin["hookid_c"]) + ". " + error);
         }
         
         // Process payload
