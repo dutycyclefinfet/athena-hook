@@ -69,42 +69,42 @@ private:
     void _upgrade(QString packageName) {
         QProcessRet ret;
         
-        m_state = QString("Upgrading ") + packageName + QString("...\nPlease wait...");
+        m_state = "Upgrading " + packageName + "...\nPlease wait...";
         emit state_changed(m_state);
         ret = _opkg("upgrade", packageName);
         
         if (!ret.err && !ret.status) {
-            m_state = QString("Upgraded ") + packageName + QString("!");
+            m_state = "Upgraded " + packageName + "!";
         } else {
-            m_state = QString("Error while upgrading ") + packageName + QString("!\n") + ret.std;
+            m_state = "Error while upgrading " + packageName + "!\n" + ret.std;
         }
         emit state_changed(m_state);
     }
     void _install(QString packageName) {
         QProcessRet ret;
         
-        m_state = QString("Installing ") + packageName + QString("...\nPlease wait...");
+        m_state = "Installing " + packageName + "...\nPlease wait...";
         emit state_changed(m_state);
         ret = _opkg("install", packageName);
         
         if (!ret.err && !ret.status) {
-            m_state = QString("Installed ") + packageName + QString("!");
+            m_state = "Installed " + packageName + "!";
         } else {
-            m_state = QString("Error while installing ") + packageName + QString("!\n") + ret.std;
+            m_state = "Error while installing " + packageName + "!\n" + ret.std;
         }
         emit state_changed(m_state);
     }
     void _remove(QString packageName) {
         QProcessRet ret;
         
-        m_state = QString("Removing ") + packageName + QString("...\nPlease wait...");
+        m_state = "Removing " + packageName + "...\nPlease wait...";
         emit state_changed(m_state);
         ret = _opkg("remove", packageName);
         
         if (!ret.err && !ret.status) {
-            m_state = QString("Removed ") + packageName + QString("!");
+            m_state = "Removed " + packageName + "!";
         } else {
-            m_state = QString("Error while removing ") + packageName + QString("!\n") + ret.std;
+            m_state = "Error while removing " + packageName + "!\n" + ret.std;
         }
         emit state_changed(m_state);
     }

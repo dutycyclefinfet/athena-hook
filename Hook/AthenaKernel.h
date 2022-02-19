@@ -25,16 +25,6 @@ class AthenaKernel : public QObject, public AthenaBase
     Q_PROPERTY(bool overlayWipe READ overlayWipe_get WRITE overlayWipe_set NOTIFY overlayWipe_changed);
     Q_PROPERTY(bool isAthena READ isAthena_get CONSTANT);
     Q_PROPERTY(bool wasCrashed READ wasCrashed_get CONSTANT);
-
-    //1.225 1.1   1.0      0
-    //1.2   1.075 0.975  -25
-    //1.2   1.05  0.95   -50
-    //1.175 1.025 0.925  -75
-    //1.15  1.0   0.9   -100
-    //1.125 0.975 0.9   -125
-    //1.1   0.95  0.9   -150
-    //1.075 0.925 0.875 -175
-    //1.05  0.9   0.85  -200
     
     const QString s_undervolt_dtb_dir = "boot/dtb";
     const QString s_undervolt_dtb_link_prefix = "dtb/";

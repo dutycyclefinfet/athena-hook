@@ -122,7 +122,7 @@ Item {
     /////////////////////////////////////////
     // Parse plugins
     /////////////////////////////////////////
-    function parsePlugins(plugins) {
+    function parsePlugins(plugins, stopOnFail = false) {
         var ret = retVal.PLUGIN_SUCCESS;
         for (var ix in plugins) {
             var plugin = plugins[ix];
@@ -153,8 +153,10 @@ Item {
             // Parse error value
             if (ret == retVal.PLUGIN_SUCCESS) {
                 console.info("Plugin " + plugin["name"] + " has been loaded.");
+                continue;
             } else if (ret == retVal.PLUGIN_DISABLED) {
                 console.info("Plugin " + plugin["name"] + " is disabled.");
+                continue;
             } else if (ret == retVal.PLUGIN_INVALID_TYPE) {
                 console.error("Plugin " + plugin["name"] + " has an invalid definition [PLUGIN_INVALID_TYPE].");
             } else if (ret == retVal.PLUGIN_INVALID_HOOKID) {
@@ -166,6 +168,8 @@ Item {
             } else if (ret == retVal.PLUGIN_NO_SUCH_FILE) {
                 console.error("Plugin " + plugin["name"] + " does not exist [PLUGIN_NO_SUCH_FILE].");
             }
+            if (stopOnFail)
+                return ret;
         }
         return ret;
     }
@@ -173,16 +177,18 @@ Item {
     // Read plugins json
     /////////////////////////////////////////
     function readPlugins() {
-        // Try to load plugins from cache
-        var cache = {};
-        try {
-            cache = JSON.parse(File.read(pluginStore_jsonc));
-            if (AthenaHook.pluginsHash == cache["hash"]) {
-                return parsePlugins(cache["plugins"]);
+        if (AthenaKernel.isAthena) {
+            // Try to load plugins from cache
+            var cache = {};
+            try {
+                cache = JSON.parse(File.read(pluginStore_jsonc));
+                if (AthenaHook.pluginsHash == cache["hash"]) {
+                    return parsePlugins(cache["plugins"], true);
+                }
+                console.warn("Rebuilding plugin cache due to hash mismatch.");
+            } catch (error) {
+                console.warn("Rebuilding plugin cache due to missing or malformed cache store.");
             }
-            console.warn("Rebuilding plugin cache due to hash mismatch.");
-        } catch (error) {
-            console.warn("Rebuilding plugin cache due to missing or malformed cache store.");
         }
         
         // Rebuild all plugin cache from scratch
