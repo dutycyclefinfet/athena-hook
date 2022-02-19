@@ -110,16 +110,16 @@ private:
     }
 public:
     Q_INVOKABLE void update() {
-        QtConcurrent::run([&]() {_update();});
+        QtConcurrent::run([=]() {_update();});
     }
     Q_INVOKABLE void upgrade(QString packageName) {
-        QtConcurrent::run([&]() {_upgrade(packageName);});
+        QtConcurrent::run([=]() {_upgrade(packageName);});
     }
     Q_INVOKABLE void install(QString packageName) {
-        QtConcurrent::run([&]() {_install(packageName);});
+        QtConcurrent::run([=]() {_install(packageName);});
     }
     Q_INVOKABLE void remove(QString packageName) {
-        QtConcurrent::run([&]() {_remove(packageName);});
+        QtConcurrent::run([=]() {_remove(packageName);});
     }
     Q_INVOKABLE QStringList getInfo(QString packageName) {
         auto ret = _opkg("info", packageName);
