@@ -52,7 +52,7 @@ public:
         return m_usbModes;
     };
     QString usbMode_get() {
-        Utils::read(m_usbMode, athenaPath(s_usb_path), " ");
+        Utils::read(m_usbMode, athenaPath(s_usb_path), "|");
         return m_usbMode;
     }
     void usbMode_set(QString val) {
