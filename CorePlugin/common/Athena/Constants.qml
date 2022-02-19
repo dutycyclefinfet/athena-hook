@@ -1,8 +1,10 @@
 pragma Singleton
 
 import QtQuick 2.0
+import common 1.0
 
 QtObject {
+    readonly property var remarkable: Values
     readonly property var keycodes: {
         "ESC": 1,
         "1": 2,
@@ -135,6 +137,6 @@ QtObject {
         "recentsBar_height": 64,
         "recentsIcon_margin": 5,
         "recentsItem_margin": 5,
-        "navbar_icon_scale": 0.85
+        "navbar_icon_scale": 1.0
     }
 }

@@ -5,16 +5,13 @@ import QtQuick 2.0
 Item {
     readonly property string _: AthenaHook.pluginsPath+"/.common/fonts/"
     
-    FontLoader {
-        id: material
+    readonly property FontLoader material: FontLoader {
         source: _+"material.ttf"
     }
-    FontLoader {
-        id: icomoon
+    readonly property FontLoader icomoon: FontLoader {
         source: _+"icomoon.ttf"
     }
-    FontLoader {
-        id: d7mono
+    readonly property FontLoader d7mono: FontLoader {
         source: _+"d7mono.ttf"
     }
 }

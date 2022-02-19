@@ -4,7 +4,7 @@ TEMPLATE = lib
 CONFIG += c++17
 
 SOURCES += AthenaBase.cpp AthenaXochitl.cpp
-HEADERS += AthenaBase.h AthenaKernel.h AthenaSettings.h AthenaOPKG.h AthenaHook.h EventHook.h
+HEADERS += AthenaBase.h AthenaKernel.h AthenaSettings.h AthenaOPKG.h AthenaHook.h AthenaSystem.h EventHook.h
 
 # Default rules for deployment.
 unix {

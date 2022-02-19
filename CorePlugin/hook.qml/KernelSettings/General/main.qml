@@ -5,6 +5,7 @@ import common 1.0
 import device.ui.controls 1.0
 import device.ui.text 1.0
 import device.view.dialogs 1.0
+
 import "." as A
 
 Row {
@@ -20,7 +21,7 @@ Row {
         id: restartXochitlButton
         text: qsTr("Restart Xochitl")
         iconCode: Icons.icon_restore
-        onClicked: AthenaHook.restartXochitl();
+        onClicked: AthenaSystem.restartXochitl();
     }
 
     Button {

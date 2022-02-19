@@ -1,8 +1,14 @@
 pragma Singleton
 
 import QtQuick 2.0
+import com.remarkable 1.0
+import com.remarkable.deviceinfo 1.0 as DeviceInfo
+import device.ui.text 1.0
+import common 1.0
 
 QtObject {
+    readonly property var battery: BatteryManager.battery
+    
     readonly property var utils: {
         "removeDiacritics": function removeDiacritics(str) {
             var defaultDiacriticsRemovalMap = [
@@ -203,7 +209,13 @@ QtObject {
             x.setRequestHeader("AthenaPayload", JSON.stringify(obj));
             x.send();
             
-            return JSON.parse(x.responseText);
+            var jsonV = {};
+            try {
+                jsonV = JSON.parse(x.responseText);
+            } catch (error) {
+                console.error("Received a malformed response.");
+            }
+            return jsonV;
         }
         function callAPISanitized(cmd, fail, obj) {
             var api = callAPI(cmd, obj);
@@ -385,5 +397,5 @@ QtObject {
         }
         return API;
     }
-    readonly property var api: getAPI();
+    readonly property var api: _getAPI();
 }

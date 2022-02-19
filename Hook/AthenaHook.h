@@ -9,7 +9,6 @@
 #include <QProcessEnvironment>
 #include <QQuickItem>
 #include "AthenaBase.h"
-#include "Utils.h"
 
 class AthenaHook : public QObject, public AthenaBase
 {
@@ -29,12 +28,6 @@ class AthenaHook : public QObject, public AthenaBase
     QString m_hash;
 
 public:
-    Q_INVOKABLE QString env(const QString& name) {
-        return QProcessEnvironment::systemEnvironment().value(name);
-    };
-    Q_INVOKABLE void restartXochitl() {
-        system("systemctl restart xochitl");
-    };
     QQuickItem* rootItem_get() {
         return m_rootItem;
     };
@@ -44,7 +37,7 @@ public:
         return m_rootPrefix;
     };
     QStringList pluginList_get() {
-        m_pluginList = Utils::listDir(AthenaBase::xochitlPluginsPath());
+        m_pluginList = listDir(AthenaBase::xochitlPluginsPath());
         
         return m_pluginList;
     };

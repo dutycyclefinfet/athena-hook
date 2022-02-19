@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include "AthenaBase.h"
 #include "AthenaSettings.h"
+#include "AthenaSystem.h"
 #include "AthenaKernel.h"
 #include "AthenaOPKG.h"
 #include "AthenaHook.h"
@@ -63,6 +64,7 @@ int QGuiApplication::exec() {
         auto athenaOPKG = new AthenaOPKG();
         auto athenaKernel = new AthenaKernel();
         auto athenaSettings = new AthenaSettings();
+        auto athenaSystem = new AthenaSystem();
         
         c->installEventFilter(evHook);
         hookItem->setParentItem(c);
@@ -73,6 +75,7 @@ int QGuiApplication::exec() {
         root->setContextProperty("AthenaOPKG", athenaOPKG);
         root->setContextProperty("AthenaKernel", athenaKernel);
         root->setContextProperty("AthenaSettings", athenaSettings);
+        root->setContextProperty("AthenaSystem", athenaSystem);
     } else {
         printf("[AUTOHOOKER] Fatal error: no engine instance found. Please report this!\n");
     }

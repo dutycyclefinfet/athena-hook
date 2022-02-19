@@ -12,7 +12,7 @@ Item {
 
     readonly property Item root_id: hookEntryPoint.root_id
     readonly property string pluginStore_dir: AthenaHook.pluginsPath // "file:///home/root/.xochitlPlugins"
-    readonly property string pluginStore_jsonc: AthenaHook.env("HOME") + "/.cache/xochitlPlugins.jsonc" //FIXME
+    readonly property string pluginStore_jsonc: AthenaSystem.getEnv("HOME") + "/.cache/xochitlPlugins.jsonc" //FIXME
     readonly property var defaultPlugins: [
             {"path": AthenaHook.rootPrefix + "usr/libexec/athenaXochitl/KernelSettings",
              "name": "KernelSettings", "type": "BUNDLE", "unhashable": true}]

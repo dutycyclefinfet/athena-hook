@@ -5,9 +5,6 @@
 #include <QDir>
 #include <QFileInfo>
 #include "AthenaBase.h"
-#include "Utils.h"
-
-#include <QDebug>
 
 class AthenaKernel : public QObject, public AthenaBase
 {
@@ -94,7 +91,7 @@ public:
     int cpuUndervolt_get() {
         _getUndervolts();
         
-        QString current_undervolt = Utils::readLink(athenaPath(s_zero_sugar_dtb_path));
+        QString current_undervolt = readLinkC(athenaPath(s_zero_sugar_dtb_path));
         int ix = s_cpuUndervolts_files.indexOf(current_undervolt);
         m_cpuUndervolt = s_cpuUndervolts.at(ix != -1 ? ix : 0);
         return m_cpuUndervolt;
@@ -105,7 +102,7 @@ public:
         int ix = s_cpuUndervolts.indexOf(val);
         if ((ix != -1) && (val != m_cpuUndervolt)) {
             QFile::remove(athenaPath(s_zero_sugar_dtb_path));
-            Utils::symLink(s_cpuUndervolts_files.at(ix), athenaPath(s_zero_sugar_dtb_path));
+            symLinkC(s_cpuUndervolts_files.at(ix), athenaPath(s_zero_sugar_dtb_path));
 
             emit cpuUndervolt_changed(val);
         }
@@ -113,14 +110,14 @@ public:
 
     int epdAdjustmentVoltage_get() {
         QString buf;
-        Utils::read(buf, s_epd_vadj_path, " ");
+        read(buf, s_epd_vadj_path, " ");
         
         m_epdAdjVoltage = buf.toInt()/1000;
         return m_epdAdjVoltage;
     }
     void epdAdjustmentVoltage_set(int val) {
         if ((val>-500) && (val<500)) {
-            Utils::write(QString::number(val*1000), s_epd_vadj_path);
+            write(QString::number(val*1000), s_epd_vadj_path);
         }
         
         emit epdAdjustmentVoltage_changed(epdAdjustmentVoltage_get());
@@ -129,7 +126,7 @@ public:
 
     int epdCurrentVoltage_get() {
         QString buf;
-        Utils::read(buf, s_current_epd_voltage_path, " ");
+        read(buf, s_current_epd_voltage_path, " ");
         
         m_epdVoltage = -buf.toInt();
         return m_epdVoltage;
@@ -137,21 +134,21 @@ public:
     
     int cpuCurrentVoltage_get() {
         QString buf;
-        Utils::read(buf, s_current_cpu_voltage_path, " ");
+        read(buf, s_current_cpu_voltage_path, " ");
         m_cpuVoltage = buf.toInt();
         return m_cpuVoltage;
     }
 
     int cpu0Frequency_get() {
         QString buf;
-        Utils::read(buf, s_current_cpu0_frequency_path, " ");
+        read(buf, s_current_cpu0_frequency_path, " ");
         m_cpu0Frequency = buf.toInt();
         return m_cpu0Frequency;
     }
 
     int cpu1Frequency_get() {
         QString buf;
-        Utils::read(buf, s_current_cpu1_frequency_path, " ");
+        read(buf, s_current_cpu1_frequency_path, " ");
         m_cpu1Frequency = buf.toInt();
         return m_cpu1Frequency;
     }
@@ -178,7 +175,7 @@ public:
     }
     void overlayWipe_set(bool val) {
         if (val) {
-            Utils::write("", athenaPath("wipe_me"));
+            write("", athenaPath("wipe_me"));
         } else {
             QFile::remove(athenaPath("wipe_me"));
         }

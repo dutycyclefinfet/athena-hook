@@ -1,6 +1,7 @@
 pragma Singleton
 
 import QtQuick 2.0
+import common 1.0
 
 QtObject {
     readonly property string a: AthenaHook.pluginsPath+"/.common/icons/applications/"
@@ -9,6 +10,7 @@ QtObject {
     readonly property string m: AthenaHook.pluginsPath+"/.common/icons/modifier/"
     readonly property string w: AthenaHook.pluginsPath+"/.common/icons/weather/"
     
+    readonly property var remarkable: Icons
     readonly property var mime: {
         "image/\w*": "image",
         "video/\w*": "videocam",
