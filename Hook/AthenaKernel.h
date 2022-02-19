@@ -113,7 +113,7 @@ public:
         _getUndervolts();
         
         int ix = s_cpuUndervolts.indexOf(val);
-        if ((ix > 0) && (val != m_cpuUndervolt)) {
+        if ((ix != -1) && (val != m_cpuUndervolt)) {
             QFile::remove(athenaPath(s_zero_sugar_dtb_path));
             Utils::symLink(s_cpuUndervolts_files.at(ix), athenaPath(s_zero_sugar_dtb_path));
 

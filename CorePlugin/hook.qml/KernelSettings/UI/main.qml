@@ -118,7 +118,7 @@ Item {
                 id: undervoltEPD_s
                 width: header.width
                 visible: AthenaKernel.isAthena
-                title: qsTr("Adjust EPD voltage by (has overvoltage protection):")
+                title: qsTr("Adjust EPD voltage by (EPD is negative):")
                 suffix: qsTr("mV")
                 from: -1000
                 stepSize: 100
