@@ -9,6 +9,7 @@ import "." as A
 
 Row {
     id: root
+    visible: parent.parent.index==0
     
     anchors.bottom: parent.bottom
     anchors.bottomMargin: 400
