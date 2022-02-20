@@ -66,6 +66,9 @@ package() {
     _install -m 644 -D "${srcdir}/root/rm2fb.service" "${pkgdir}/lib/systemd/system/rm2fb.service"
     _install -m 644 -D "${srcdir}/root/adjust-epd.service" "${pkgdir}/lib/systemd/system/adjust-epd.service"
     
+    # /etc/ld.so.conf.d/ Add opt dirs
+    _install -m 644 -D "${srcdir}/root/ld-opt.conf" "${pkgdir}/etc/ld.so.conf.d/opt.conf"
+    
     # /etc/athena/usb_modes
     _install -m 644 -D "${srcdir}/root/usb_modes" "${pkgdir}/etc/athena/usb_modes"
     
