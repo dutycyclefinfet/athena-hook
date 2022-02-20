@@ -8,7 +8,11 @@
 #include <QCryptographicHash>
 #include <QProcessEnvironment>
 #include <QQuickItem>
+#include <QImage>
+#include <QQuickWindow>
+#include <QScreen>
 #include "AthenaBase.h"
+#include <QDebug>
 
 class AthenaHook : public QObject, public AthenaBase
 {
@@ -65,6 +69,16 @@ public:
         }
         m_hash = QCryptographicHash::hash(hash.toLocal8Bit(), QCryptographicHash::Md5).toHex();
         return m_hash;
+    };
+    Q_INVOKABLE bool screenshot(const QString& path) {
+        auto window = m_rootItem->window();
+        auto winID = window->winId();
+        auto screen = window->screen();
+        auto pxmap = screen->grabWindow(0);
+        
+        qDebug() << window << "->" << winID << "->" << screen << "->" << pxmap << "->" << pxmap.save(path);
+        
+        return pxmap.save(path);
     };
     
     AthenaHook(QQuickItem* _rootItem) : QObject(nullptr) {

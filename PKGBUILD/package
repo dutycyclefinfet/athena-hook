@@ -11,18 +11,35 @@ installdepends=(athena-linux)
 license=GPL-3.0-or-later
 image=qt:v2.2.2
 makedepends=()
+conflicts=(rm2fb rm2fb-client display)
+replaces=(rm2fb rm2fb-client display)
 
 source=()
 sha256sums=()
 
 prepare() {
     git clone --depth 1 https://github.com/dutycyclefinfet/athena-hook "${srcdir}"
+    
+    RM2FB_CLIENT="https://github.com/ddvk/remarkable2-framebuffer/releases/download/v0.0.14/librm2fb_client.so.1.0.1"
+    RM2FB_SERVER="https://github.com/ddvk/remarkable2-framebuffer/releases/download/v0.0.14/librm2fb_server.so.1.0.1"
+    wget -q "${RM2FB_CLIENT}" -O "${srcdir}"/rm2fb/opt/lib/librm2fb_client.so.1.0.1
+    wget -q "${RM2FB_SERVER}" -O "${srcdir}"/rm2fb/opt/lib/librm2fb_server.so.1.0.1
 }
 
 build() {
     cd Hook
     qmake
     make -j$(nproc)
+}
+
+configure() {
+    if uname -r | grep athena > /dev/null ; then
+        sed -i '/Environment=.*$/d' /lib/systemd/system/xochitl.service
+        sed -i '/StartLimitInterval=.*$/d' /lib/systemd/system/xochitl.service
+        systemctl daemon-reload
+        bash -c "sleep 10\nsystemctl stop xochitl\nsystemctl start rm2fb\nsystemctl start xochitl" &
+        disown
+    fi
 }
 
 function _install() {
@@ -50,4 +67,6 @@ package() {
     _install -m 644 -D "${srcdir}/Hook/zram" "${pkgdir}/etc/athena/zram"
     _install -m 644 -D "${srcdir}/Hook/usb" "${pkgdir}/etc/athena/usb"
     _install -m 644 -D "${srcdir}/Hook/usb_modes" "${pkgdir}/etc/athena/usb_modes"
+    
+    _install -r -m 644 -D "${srcdir}/rm2fb" "${pkgdir}"
 }

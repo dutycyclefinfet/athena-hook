@@ -36,6 +36,9 @@ Item {
     }
     onUpgradableChanged: {
         showModal("Upgradable packages updated.\n ");
+        if (upgradable.length > 0) {
+            header.active = header.cells[3];
+        }
     }
     onVisibleChanged: {
         if (visible) {

@@ -38,30 +38,38 @@ private:
         return result;
     }
 
-    void _update() {
+    void _update(int flags = 0x0f) {
         QProcessRet ret;
         
-        m_state = "Updating cache...\nPlease wait...";
-        emit state_changed(m_state);
-        ret = _opkg("update");
+        if (flags & 0x01) {
+            m_state = "Updating cache...\nPlease wait...";
+            emit state_changed(m_state);
+            ret = _opkg("update");
+        }
         
-        m_state = "Listing packages\nPlease wait...";
-        emit state_changed(m_state);
-        ret = _opkg("find", "*");
-        m_allPackages = _pkgOutputToList(ret.std);
-        emit allPackages_changed(m_allPackages);
+        if (flags & 0x02) {
+            m_state = "Listing packages\nPlease wait...";
+            emit state_changed(m_state);
+            ret = _opkg("find", "*");
+            m_allPackages = _pkgOutputToList(ret.std);
+            emit allPackages_changed(m_allPackages);
+        }
         
-        m_state = "Listing upgradable packages\nPlease wait...";
-        emit state_changed(m_state);
-        ret = _opkg("list-upgradable");
-        m_upgradablePackages = _pkgOutputToList(ret.std);
-        emit installedPackages_changed(m_installedPackages);
+        if (flags & 0x04) {
+            m_state = "Listing upgradable packages\nPlease wait...";
+            emit state_changed(m_state);
+            ret = _opkg("list-upgradable");
+            m_upgradablePackages = _pkgOutputToList(ret.std);
+            emit installedPackages_changed(m_installedPackages);
+        }
         
-        m_state = "Listing installed packages\nPlease wait...";
-        emit state_changed(m_state);
-        ret = _opkg("list-installed");
-        m_installedPackages = _pkgOutputToList(ret.std);
-        emit upgradablePackages_changed(m_upgradablePackages);
+        if (flags & 0x08) {
+            m_state = "Listing installed packages\nPlease wait...";
+            emit state_changed(m_state);
+            ret = _opkg("list-installed");
+            m_installedPackages = _pkgOutputToList(ret.std);
+            emit upgradablePackages_changed(m_upgradablePackages);
+        }
         
         m_state = "";
         emit state_changed(m_state);
@@ -109,8 +117,8 @@ private:
         emit state_changed(m_state);
     }
 public:
-    Q_INVOKABLE void update() {
-        QtConcurrent::run([=]() {_update();});
+    Q_INVOKABLE void update(int flags = 0x0f) {
+        QtConcurrent::run([=]() {_update(flags);});
     }
     Q_INVOKABLE void upgrade(QString packageName) {
         QtConcurrent::run([=]() {_upgrade(packageName);});

@@ -6,3 +6,6 @@ if [ "$1" == "--adjust-epd" ]; then
         [ -f /etc/athena/epd ] && cat /etc/athena/epd > $f
     done
 fi
+if [ "$1" == "--pre-set-environment" ]; then
+    /etc/environments.d/$2
+fi

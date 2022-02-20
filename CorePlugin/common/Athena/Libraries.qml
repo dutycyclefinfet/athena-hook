@@ -231,55 +231,23 @@ QtObject {
             }
         }
         function _getSettingsStore(cmd, cb) {
-            var hasProxy;
-            try {
-                if (Proxy) {
-                    hasProxy = true;
+            var tmp = {"__obj_bak": callAPISanitized(cmd, {})};
+            return new Proxy(tmp, {
+                get: function(target, name) {
+                    if (name === 'toJSON') {
+                        return function(){ return target.__obj_bak; };
+                    } else {
+                        return target.__obj_bak[name];
+                    }
+                },
+                set: function(target, name, value) {
+                    target.__obj_bak[name] = value;
+                    cb(target.__obj_bak, name, value);
+                },
+                ownKeys: function(target) {
+                    return Reflect.ownKeys(target.__obj_bak);
                 }
-            } catch (error) {
-                hasProxy = false;
-            }
-            if (hasProxy) {
-                var tmp = {"__obj_bak": callAPISanitized(cmd, {})};
-                return new Proxy(tmp, {
-                    get: function(target, name) {
-                        if (name === 'toJSON') {
-                            return function(){ return target.__obj_bak; };
-                        } else {
-                            return target.__obj_bak[name];
-                        }
-                    },
-                    set: function(target, name, value) {
-                        target.__obj_bak[name] = value;
-                        cb(target.__obj_bak, name, value);
-                    },
-                    ownKeys: function(target) {
-                        return Reflect.ownKeys(target.__obj_bak);
-                    }
-                });
-            } else { //No Proxy - ancient QT. Update your reMarkable you ass.
-                var obj = callAPISanitized(cmd, {});
-                obj["__obj_bak"] = JSON.parse(JSON.stringify(obj));
-                obj["__obj_legacy_caller"] = function() {
-                    var keys = Object.keys(obj);
-                    var changes = 0;
-                    for (var i=0; i<keys.length; i++) {
-                        if (keys[i] == "__obj_bak" || keys[i] == "__obj_legacy_caller") {
-                            continue;
-                        } else {
-                            if (JSON.stringify(obj[keys[i]]) != JSON.stringify(obj["__obj_bak"][keys[i]])) {
-                                obj["__obj_bak"][keys[i]] = obj[keys[i]];
-                                cb(obj["__obj_bak"], keys[i], obj[keys[i]]);
-                                changes++;
-                            }
-                        }
-                    }
-                    if (changes) {
-                        console.log("[LegacySettings] Modified " + changes + " settings");
-                    }
-                };
-                return obj;
-            }
+            });
         }
         var API = {
             //Settings
@@ -303,18 +271,6 @@ QtObject {
                 callAPI("startApp", {"name": name, "path": path});
             },
             //System
-            ls: function(dir) {
-                callAPI("ls", {"path": dir});
-            },
-            rm: function(f) {
-                callAPI("rm", {"path": f});
-            },
-            cp: function(src, dst) {
-                callAPI("ls", {"path": src, "destination": dst});
-            },
-            mv: function(src, dst) {
-                callAPI("mv", {"path": src, "destination": dst});
-            },
             screenshot: function(dst) {
                 callAPI("captureScreenshot", {"path": dst});
             },
@@ -346,14 +302,6 @@ QtObject {
         });
         Object.defineProperty(API, "availableApps", {
             get: function() { return callAPISanitized("getAvailableApps", []); },
-            writeable: false
-        });
-        Object.defineProperty(API, "battery", {
-            get: function() { return callAPISanitized("getBattery", {}); },
-            writeable: false
-        });
-        Object.defineProperty(API, "RAM", {
-            get: function() { return callAPISanitized("getRAM", {}); },
             writeable: false
         });
 
