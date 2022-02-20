@@ -37,6 +37,7 @@ configure() {
         sed -i '/Environment=.*$/d' /lib/systemd/system/xochitl.service
         sed -i '/StartLimitInterval=.*$/d' /lib/systemd/system/xochitl.service
         sed -i '/OnFailure=.*$/d' /lib/systemd/system/xochitl.service
+        sed -i '/WatchdogSec=.*$/d' /lib/systemd/system/xochitl.service
         systemctl daemon-reload
         bash -c "sleep 10 && systemctl stop xochitl && systemctl start rm2fb && systemctl start xochitl" &
         disown
