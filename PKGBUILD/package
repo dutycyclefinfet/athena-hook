@@ -36,8 +36,9 @@ configure() {
     if uname -r | grep athena > /dev/null ; then
         sed -i '/Environment=.*$/d' /lib/systemd/system/xochitl.service
         sed -i '/StartLimitInterval=.*$/d' /lib/systemd/system/xochitl.service
+        sed -i '/OnFailure=.*$/d' /lib/systemd/system/xochitl.service
         systemctl daemon-reload
-        bash -c "sleep 10\nsystemctl stop xochitl\nsystemctl start rm2fb\nsystemctl start xochitl" &
+        bash -c "sleep 10 && systemctl stop xochitl && systemctl start rm2fb && systemctl start xochitl" &
         disown
     fi
 }
@@ -69,7 +70,7 @@ package() {
     _install -m 644 -D "${srcdir}/root/usb_modes" "${pkgdir}/etc/athena/usb_modes"
     
     # /opt/bin/ rm2fb
-    _install -m 755 -D "${srcdir}/root/librm2fb_client.so.1.0.1" "${pkgdir}/opt/lib/librm2fb_client.so.1.0.1"
+    _install -m 755 -D "${srcdir}/root/rm2fb-client" "${pkgdir}/opt/bin/rm2fb-client"
     
     # /etc/systemd/system/multi-user.target.wants/ Install initial services
     mkdir -p "${pkgdir}"/etc/systemd/system/multi-user.target.wants/
@@ -95,10 +96,12 @@ package() {
     # /opt/lib/ rm2fb
     _install -m 755 -D "${srcdir}/root/librm2fb_client.so.1.0.1" "${pkgdir}/opt/lib/librm2fb_client.so.1.0.1"
     _install -m 755 -D "${srcdir}/root/librm2fb_server.so.1.0.1" "${pkgdir}/opt/lib/librm2fb_server.so.1.0.1"
-    ln -s /opt/lib/librm2fb_client.so.1 "${pkgdir}/opt/lib/librm2fb_client.so.1"
-    ln -s /opt/lib/librm2fb_client.so.1.0 "${pkgdir}/opt/lib/librm2fb_client.so.1.0"
-    ln -s /opt/lib/librm2fb_server.so.1 "${pkgdir}/opt/lib/librm2fb_server.so.1"
-    ln -s /opt/lib/librm2fb_server.so.1.0 "${pkgdir}/opt/lib/librm2fb_server.so.1.0"
+    ln -s /opt/lib/librm2fb_client.so.1.0.1 "${pkgdir}/opt/lib/librm2fb_client.so"
+    ln -s /opt/lib/librm2fb_client.so.1.0.1 "${pkgdir}/opt/lib/librm2fb_client.so.1"
+    ln -s /opt/lib/librm2fb_client.so.1.0.1 "${pkgdir}/opt/lib/librm2fb_client.so.1.0"
+    ln -s /opt/lib/librm2fb_server.so.1.0.1 "${pkgdir}/opt/lib/librm2fb_server.so"
+    ln -s /opt/lib/librm2fb_server.so.1.0.1 "${pkgdir}/opt/lib/librm2fb_server.so.1"
+    ln -s /opt/lib/librm2fb_server.so.1.0.1 "${pkgdir}/opt/lib/librm2fb_server.so.1.0"
     
     # /usr/lib/ rm2fb
     _install -d "${pkgdir}/usr/lib"

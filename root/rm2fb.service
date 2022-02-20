@@ -7,7 +7,7 @@ Before=xochitl.service launcher.service remarkable-reboot.service remarkable-shu
 After=opt.mount
 StartLimitInterval=30
 StartLimitBurst=5
-ConditionFileNotEmpty=/opt/lib/librm2fb_server.so.1
+ConditionFileNotEmpty=/opt/lib/librm2fb_server.so
 
 [Service]
 Type=notify
@@ -15,7 +15,7 @@ ExecStart=/usr/bin/xochitl
 Restart=on-failure
 RestartSec=5
 Environment="HOME=/home/root"
-Environment="LD_PRELOAD=/opt/lib/librm2fb_server.so.1"
+Environment="LD_PRELOAD=/opt/lib/librm2fb_server.so"
 
 [Install]
 WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+[Unit]
+Description=reMarkable main application
+After=home.mount
+
+[Service]
+ExecStart=/usr/bin/xochitl --system
+Restart=on-failure
+WatchdogSec=60
+
+[Install]
+WantedBy=multi-user.target
