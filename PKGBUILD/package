@@ -22,8 +22,8 @@ prepare() {
     
     RM2FB_CLIENT="https://github.com/ddvk/remarkable2-framebuffer/releases/download/v0.0.14/librm2fb_client.so.1.0.1"
     RM2FB_SERVER="https://github.com/ddvk/remarkable2-framebuffer/releases/download/v0.0.14/librm2fb_server.so.1.0.1"
-    wget -q "${RM2FB_CLIENT}" -O "${srcdir}"/rm2fb/opt/lib/librm2fb_client.so.1.0.1
-    wget -q "${RM2FB_SERVER}" -O "${srcdir}"/rm2fb/opt/lib/librm2fb_server.so.1.0.1
+    wget -q "${RM2FB_CLIENT}" -O "${srcdir}/root/librm2fb_client.so.1.0.1"
+    wget -q "${RM2FB_SERVER}" -O "${srcdir}/root/librm2fb_server.so.1.0.1"
 }
 
 build() {
@@ -57,16 +57,56 @@ function _install() {
 package() {
     _install -r -m 644 -D "${srcdir}/OPKGPlugin" "${pkgdir}/home/root/.xochitlPlugins/AthenaOPKG"
     _install -r -m 644 -D "${srcdir}/CorePlugin/common" "${pkgdir}/home/root/.xochitlPlugins/.common"
-    
     _install -r -m 644 -D "${srcdir}/CorePlugin/hook.qml" "${pkgdir}/usr/libexec/athenaXochitl"
-    _install -m 644 -D "${srcdir}/Hook/adjust-epd.service" "${pkgdir}/lib/systemd/system/adjust-epd.service"
+    
     _install -m 755 -D "${srcdir}/Hook/libAthenaXochitl.so.1.0.0" "${pkgdir}/usr/libexec/libAthenaXochitl.so"
-    _install -m 755 -D "${srcdir}/Hook/athenaHelper.sh" "${pkgdir}/usr/libexec/athenaHelper"
+    _install -m 755 -D "${srcdir}/root/athenaHelper.sh" "${pkgdir}/usr/libexec/athenaHelper"
     
-    _install -m 644 -D "${srcdir}/Hook/epd" "${pkgdir}/etc/athena/epd"
-    _install -m 644 -D "${srcdir}/Hook/zram" "${pkgdir}/etc/athena/zram"
-    _install -m 644 -D "${srcdir}/Hook/usb" "${pkgdir}/etc/athena/usb"
-    _install -m 644 -D "${srcdir}/Hook/usb_modes" "${pkgdir}/etc/athena/usb_modes"
+    _install -m 644 -D "${srcdir}/root/rm2fb.service" "${pkgdir}/lib/systemd/system/rm2fb.service"
+    _install -m 644 -D "${srcdir}/root/adjust-epd.service" "${pkgdir}/lib/systemd/system/adjust-epd.service"
     
-    _install -r -m 644 -D "${srcdir}/rm2fb" "${pkgdir}"
+    # /etc/athena/usb_modes
+    _install -m 644 -D "${srcdir}/root/usb_modes" "${pkgdir}/etc/athena/usb_modes"
+    
+    # /opt/bin/ rm2fb
+    _install -m 755 -D "${srcdir}/root/librm2fb_client.so.1.0.1" "${pkgdir}/opt/lib/librm2fb_client.so.1.0.1"
+    
+    # /etc/systemd/system/multi-user.target.wants/ Install initial services
+    mkdir -p "${pkgdir}"/etc/systemd/system/multi-user.target.wants/
+    ln -s /lib/systemd/system/rm2fb.service "${pkgdir}/etc/systemd/system/multi-user.target.wants/rm2fb.service"
+    ln -s /lib/systemd/system/adjust-epd.service "${pkgdir}/etc/systemd/system/multi-user.target.wants/adjust-epd.service"
+    
+    # /etc/systemd/system/ Create units.d -> athena.conf
+    mkdir -p "${pkgdir}"/etc/systemd/system/{multi-user.target.wants,draft.service.d,remux.service.d,tarnish.service.d,xochitl.service.d}/
+    ln -s /etc/environments.d/athena.conf "${pkgdir}/etc/systemd/system/draft.service.d/athena.conf"
+    ln -s /etc/environments.d/athena.conf "${pkgdir}/etc/systemd/system/remux.service.d/athena.conf"
+    ln -s /etc/environments.d/athena.conf "${pkgdir}/etc/systemd/system/tarnish.service.d/athena.conf"
+    ln -s /etc/environments.d/athena.conf "${pkgdir}/etc/systemd/system/xochitl.service.d/athena.conf"
+    
+    # /etc/environments.d Create initial 2 configs
+    _install -m 644 -D "${srcdir}/root/athena.conf" "${pkgdir}/etc/environments.d/athena.conf"
+    _install -m 644 -D "${srcdir}/root/rm2fb-client.env" "${pkgdir}/etc/environments.d/rm2fb-client.env"
+    _install -m 644 -D "${srcdir}/root/xochitl.env" "${pkgdir}/etc/environments.d/xochitl.env"
+    ln -s rm2fb-client.env "${pkgdir}/etc/environments.d/draft.service"
+    ln -s rm2fb-client.env "${pkgdir}/etc/environments.d/remux.service"
+    ln -s rm2fb-client.env "${pkgdir}/etc/environments.d/tarnish.service"
+    ln -s xochitl.env "${pkgdir}/etc/environments.d/xochitl.service"
+    
+    # /opt/lib/ rm2fb
+    _install -m 755 -D "${srcdir}/root/librm2fb_client.so.1.0.1" "${pkgdir}/opt/lib/librm2fb_client.so.1.0.1"
+    _install -m 755 -D "${srcdir}/root/librm2fb_server.so.1.0.1" "${pkgdir}/opt/lib/librm2fb_server.so.1.0.1"
+    ln -s /opt/lib/librm2fb_client.so.1 "${pkgdir}/opt/lib/librm2fb_client.so.1"
+    ln -s /opt/lib/librm2fb_client.so.1.0 "${pkgdir}/opt/lib/librm2fb_client.so.1.0"
+    ln -s /opt/lib/librm2fb_server.so.1 "${pkgdir}/opt/lib/librm2fb_server.so.1"
+    ln -s /opt/lib/librm2fb_server.so.1.0 "${pkgdir}/opt/lib/librm2fb_server.so.1.0"
+    
+    # /usr/lib/ rm2fb
+    _install -d "${pkgdir}/usr/lib"
+    ln -s /opt/lib/librm2fb_client.so.1.0.1 "${pkgdir}/usr/lib/librm2fb_client.so.1"
+    ln -s /opt/lib/librm2fb_client.so.1.0.1 "${pkgdir}/usr/lib/librm2fb_client.so.1.0"
+    ln -s /opt/lib/librm2fb_client.so.1.0.1 "${pkgdir}/usr/lib/librm2fb_client.so.1.0.1"
+    ln -s /opt/lib/librm2fb_server.so.1.0.1 "${pkgdir}/usr/lib/librm2fb_server.so.1"
+    ln -s /opt/lib/librm2fb_server.so.1.0.1 "${pkgdir}/usr/lib/librm2fb_server.so.1.0"
+    ln -s /opt/lib/librm2fb_server.so.1.0.1 "${pkgdir}/usr/lib/librm2fb_server.so.1.0.1"
+    
 }

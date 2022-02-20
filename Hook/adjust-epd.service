@@ -1,9 +1,0 @@
-[Unit]
-Description=Athena EPD adjustment
-After=home.mount
-
-[Service]
-ExecStart=/usr/libexec/athenaHelper --adjust-epd
-
-[Install]
-WantedBy=multi-user.target

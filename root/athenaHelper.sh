@@ -7,5 +7,6 @@ if [ "$1" == "--adjust-epd" ]; then
     done
 fi
 if [ "$1" == "--pre-set-environment" ]; then
-    /etc/environments.d/$2
+    cmd=$(grep '#' /etc/environments.d/$2 | tr '#' ' ; ')
+    bash -c "echo Executing reconfig for $2 now. ${cmd}"
 fi
