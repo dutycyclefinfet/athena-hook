@@ -46,18 +46,18 @@ public:
     // USB
     QStringList usbModes_get() {
         m_usbModes.clear();
-        readAndSplit(m_usbModes, athenaPath(s_usb_modes_path), "|");
+        readFileAndSplit(m_usbModes, athenaPath(s_usb_modes_path), "|");
         
         return m_usbModes;
     };
     QString usbMode_get() {
-        read(m_usbMode, athenaPath(s_usb_path), "|");
+        readFile(m_usbMode, athenaPath(s_usb_path), "|");
         return m_usbMode;
     }
     void usbMode_set(QString val) {
         QString old_val = usbMode_get();
         if (val != old_val) {
-            write(val, athenaPath(s_usb_path));
+            writeFile(val, athenaPath(s_usb_path));
 
             if (AthenaBase::isAthenaRunning()) {
                 _restartUsbDaemon();
@@ -70,17 +70,17 @@ public:
     // CPU
     QStringList cpuGovernors_get() {
         m_cpuGovernors.clear();
-        readAndSplit(m_cpuGovernors, s_cpu0_available_governors_path, " ");
+        readFileAndSplit(m_cpuGovernors, s_cpu0_available_governors_path, " ");
         return m_cpuGovernors;
     };
     QString cpuGovernor_get() {
         m_cpuGovernor = "";
-        read(m_cpuGovernor, s_cpu0_governor_path, " ");
+        readFile(m_cpuGovernor, s_cpu0_governor_path, " ");
         return m_cpuGovernor;
     }
     void cpuGovernor_set(QString val) {
-        write(val, s_cpu0_governor_path);
-        write(val, s_cpu1_governor_path);
+        writeFile(val, s_cpu0_governor_path);
+        writeFile(val, s_cpu1_governor_path);
 
         emit cpuGovernor_changed(val);
     }
@@ -88,12 +88,12 @@ public:
     // ZRAM
     int zRAM_get() {
         QString buf;
-        read(buf, athenaPath(s_zram_path), " ");
+        readFile(buf, athenaPath(s_zram_path), " ");
         m_zRAM = buf.toInt();
         return m_zRAM;
     }
     void zRAM_set(int val) {
-        write(QString::number(val), athenaPath(s_zram_path));
+        writeFile(QString::number(val), athenaPath(s_zram_path));
 
         emit zRAM_changed(val);
     }

@@ -285,7 +285,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                height: 48+radius
+                height: 128+radius
                 border.width: popup_container.border.width
                 border.color: popup_container.border.color
                 radius: popup_container.radius
@@ -304,7 +304,7 @@ Item {
                     Text {
                         text: popup.upgrade ? "Upgrade" : "Install"
                         color: "#000000"
-                        font.pixelSize: (parent.height-parent.radius)/2
+                        font.pixelSize: (parent.height-parent.radius)/4
                         anchors.centerIn: parent
                         anchors.verticalCenterOffset: parent.radius/2
                     }
@@ -346,7 +346,7 @@ Item {
                     Text {
                         text: "Remove"
                         color: "#000000"
-                        font.pixelSize: (parent.height-parent.radius)/2
+                        font.pixelSize: (parent.height-parent.radius)/4
                         anchors.centerIn: parent
                         anchors.verticalCenterOffset: parent.radius/2
                     }

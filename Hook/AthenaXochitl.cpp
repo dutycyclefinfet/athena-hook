@@ -76,6 +76,8 @@ int QGuiApplication::exec() {
         root->setContextProperty("AthenaKernel", athenaKernel);
         root->setContextProperty("AthenaSettings", athenaSettings);
         root->setContextProperty("AthenaSystem", athenaSystem);
+        
+        AthenaBase::finish();
     } else {
         printf("[AUTOHOOKER] Fatal error: no engine instance found. Please report this!\n");
     }

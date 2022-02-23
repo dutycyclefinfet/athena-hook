@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenSSH Watchdog for Athena Kernel
+After=sshd.service
+After=network.target
+
+[Service]
+ExecStart=/usr/libexec/athenaHelper --sshd-watchdog
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

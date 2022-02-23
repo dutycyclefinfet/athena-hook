@@ -11,12 +11,12 @@ class AthenaKernel : public QObject, public AthenaBase
     Q_OBJECT
     // CPU
     Q_PROPERTY(int cpuUndervolt READ cpuUndervolt_get WRITE cpuUndervolt_set NOTIFY cpuUndervolt_changed);
-    Q_PROPERTY(QList<int> cpuUndervolts READ cpuUndervolts_get);
+    Q_PROPERTY(QList<int> cpuUndervolts READ cpuUndervolts_get NOTIFY cpuUndervolts_changed);
     Q_PROPERTY(int epdCurrentVoltage READ epdCurrentVoltage_get NOTIFY epdCurrentVoltage_changed);
     Q_PROPERTY(int epdAdjustmentVoltage READ epdAdjustmentVoltage_get WRITE epdAdjustmentVoltage_set NOTIFY epdAdjustmentVoltage_changed);
-    Q_PROPERTY(int cpuCurrentVoltage READ cpuCurrentVoltage_get);
-    Q_PROPERTY(int cpu0Frequency READ cpu0Frequency_get);
-    Q_PROPERTY(int cpu1Frequency READ cpu1Frequency_get);
+    Q_PROPERTY(int cpuCurrentVoltage READ cpuCurrentVoltage_get NOTIFY cpuCurrentVoltage_changed);
+    Q_PROPERTY(int cpu0Frequency READ cpu0Frequency_get NOTIFY cpu0Frequency_changed);
+    Q_PROPERTY(int cpu1Frequency READ cpu1Frequency_get NOTIFY cpu1Frequency_changed);
     // Kernel
     Q_PROPERTY(bool bootAthena READ bootAthena_get WRITE bootAthena_set NOTIFY bootAthena_changed);
     Q_PROPERTY(bool overlayWipe READ overlayWipe_get WRITE overlayWipe_set NOTIFY overlayWipe_changed);
@@ -110,14 +110,14 @@ public:
 
     int epdAdjustmentVoltage_get() {
         QString buf;
-        read(buf, s_epd_vadj_path, " ");
+        readFile(buf, s_epd_vadj_path, " ");
         
         m_epdAdjVoltage = buf.toInt()/1000;
         return m_epdAdjVoltage;
     }
     void epdAdjustmentVoltage_set(int val) {
         if ((val>-500) && (val<500)) {
-            write(QString::number(val*1000), s_epd_vadj_path);
+            writeFile(QString::number(val*1000), s_epd_vadj_path);
         }
         
         emit epdAdjustmentVoltage_changed(epdAdjustmentVoltage_get());
@@ -126,7 +126,7 @@ public:
 
     int epdCurrentVoltage_get() {
         QString buf;
-        read(buf, s_current_epd_voltage_path, " ");
+        readFile(buf, s_current_epd_voltage_path, " ");
         
         m_epdVoltage = -buf.toInt();
         return m_epdVoltage;
@@ -134,21 +134,21 @@ public:
     
     int cpuCurrentVoltage_get() {
         QString buf;
-        read(buf, s_current_cpu_voltage_path, " ");
+        readFile(buf, s_current_cpu_voltage_path, " ");
         m_cpuVoltage = buf.toInt();
         return m_cpuVoltage;
     }
 
     int cpu0Frequency_get() {
         QString buf;
-        read(buf, s_current_cpu0_frequency_path, " ");
+        readFile(buf, s_current_cpu0_frequency_path, " ");
         m_cpu0Frequency = buf.toInt();
         return m_cpu0Frequency;
     }
 
     int cpu1Frequency_get() {
         QString buf;
-        read(buf, s_current_cpu1_frequency_path, " ");
+        readFile(buf, s_current_cpu1_frequency_path, " ");
         m_cpu1Frequency = buf.toInt();
         return m_cpu1Frequency;
     }
@@ -175,7 +175,7 @@ public:
     }
     void overlayWipe_set(bool val) {
         if (val) {
-            write("", athenaPath("wipe_me"));
+            writeFile("", athenaPath("wipe_me"));
         } else {
             QFile::remove(athenaPath("wipe_me"));
         }
@@ -198,11 +198,20 @@ public:
     }
 
     AthenaKernel() : QObject(nullptr) {
+        addFileMonitor(s_zero_sugar_dtb_path, cpuUndervolt);
+        addSysfsMonitor(s_current_cpu_voltage_path, cpuCurrentVoltage);
+        addSysfsMonitor(s_current_epd_voltage_path, epdCurrentVoltage);
+        addSysfsMonitor(s_current_cpu0_frequency_path, cpu0Frequency);
+        addSysfsMonitor(s_current_cpu1_frequency_path, cpu1Frequency);
     }
 signals:
     void epdAdjustmentVoltage_changed(int);
     void epdCurrentVoltage_changed(int);
     void cpuUndervolt_changed(int);
+    void cpuUndervolts_changed(int);
+    void cpuCurrentVoltage_changed(int);
+    void cpu0Frequency_changed(int);
+    void cpu1Frequency_changed(int);
     void bootAthena_changed(bool);
     void overlayWipe_changed(bool);
     void wasCrashed_changed(bool);

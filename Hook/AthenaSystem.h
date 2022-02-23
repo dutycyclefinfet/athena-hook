@@ -23,8 +23,11 @@ class AthenaSystem : public QObject, public AthenaBase
 {
     Q_OBJECT
     
-    const QString s_battery_dir = "/sys/class/power_supply/";
+    Q_PROPERTY(QStringList sshConnections READ sshConnections_get NOTIFY sshConnections_changed);
     
+    const QString s_battery_dir = "/sys/class/power_supply/";
+    const QString m_sshConnections_path = "/tmp/sshd.pid";
+    QStringList m_sshConnections;
 public:
     Q_INVOKABLE QStringList dir(const QString& path, bool hiddenFiles = false) {
         return listDir(path, hiddenFiles);
@@ -87,6 +90,10 @@ public:
             return get_phys_pages()*sysconf(_SC_PAGESIZE);
         }
     }
+    Q_INVOKABLE QStringList sshConnections_get() {
+        readFileAndSplit(m_sshConnections, m_sshConnections_path, "\n");
+        return m_sshConnections;
+    };
     
     Q_INVOKABLE QVariantList getBatteries() {
         QVariantList ret;
@@ -108,7 +115,7 @@ public:
                     QString value;
                     
                     if (battInfo[ix0].isFile() && key[0] != '.') {
-                        read(value, battInfo[ix0].absoluteFilePath());
+                        readFile(value, battInfo[ix0].absoluteFilePath());
                         battHash.insert(key, value);
                     }
                 }
@@ -119,7 +126,11 @@ public:
     }
     
     AthenaSystem() : QObject(nullptr) {
+        addFileMonitor(m_sshConnections_path, sshConnections);
     }
+    
+signals:
+    void sshConnections_changed(QStringList);
 };
 
 #endif //__ATHENASYSTEM_H__

@@ -5,19 +5,18 @@
 #include <QtConcurrent>
 #include "AthenaBase.h"
 
-class AthenaOPKG : public QObject, public AthenaBase
+class OPKGThread : public QThread, AthenaBase
 {
     Q_OBJECT
-    Q_PROPERTY(QStringList allPackages READ allPackages_get NOTIFY allPackages_changed);
-    Q_PROPERTY(QStringList installedPackages READ installedPackages_get NOTIFY installedPackages_changed);
-    Q_PROPERTY(QStringList upgradablePackages READ upgradablePackages_get NOTIFY upgradablePackages_changed);
-    Q_PROPERTY(QString state READ state_get NOTIFY state_changed);
     
     QStringList m_allPackages;
     QStringList m_installedPackages;
     QStringList m_upgradablePackages;
     QString m_state;
     
+    QString packageName;
+    QString cmd;
+    int flags;
 private:
     QProcessRet _opkg(const QString& cmd, const QString additional_arg = "") {
         return runProcess("/opt/bin/opkg", cmd, additional_arg);
@@ -38,7 +37,7 @@ private:
         return result;
     }
 
-    void _update(int flags = 0x0f) {
+    void _update() {
         QProcessRet ret;
         
         if (flags & 0x01) {
@@ -74,65 +73,40 @@ private:
         m_state = "";
         emit state_changed(m_state);
     }
-    void _upgrade(QString packageName) {
+    void _do(QString text1, QString text2, QString text3, QString text4) {
         QProcessRet ret;
         
-        m_state = "Upgrading " + packageName + "...\nPlease wait...";
+        m_state = text2 + " " + packageName + "...\nPlease wait...";
         emit state_changed(m_state);
-        ret = _opkg("upgrade", packageName);
+        ret = _opkg(text1, packageName);
         
         if (!ret.err && !ret.status) {
-            m_state = "Upgraded " + packageName + "!";
+            m_state = text3 + " " + packageName + "!";
         } else {
-            m_state = "Error while upgrading " + packageName + "!\n" + ret.std;
-        }
-        emit state_changed(m_state);
-    }
-    void _install(QString packageName) {
-        QProcessRet ret;
-        
-        m_state = "Installing " + packageName + "...\nPlease wait...";
-        emit state_changed(m_state);
-        ret = _opkg("install", packageName);
-        
-        if (!ret.err && !ret.status) {
-            m_state = "Installed " + packageName + "!";
-        } else {
-            m_state = "Error while installing " + packageName + "!\n" + ret.std;
-        }
-        emit state_changed(m_state);
-    }
-    void _remove(QString packageName) {
-        QProcessRet ret;
-        
-        m_state = "Removing " + packageName + "...\nPlease wait...";
-        emit state_changed(m_state);
-        ret = _opkg("remove", packageName);
-        
-        if (!ret.err && !ret.status) {
-            m_state = "Removed " + packageName + "!";
-        } else {
-            m_state = "Error while removing " + packageName + "!\n" + ret.std;
+            m_state = "Error while " + text4 + " " + packageName + "!\n" + ret.std + "\n\n" + ret.stderr;
         }
         emit state_changed(m_state);
     }
 public:
-    Q_INVOKABLE void update(int flags = 0x0f) {
-        QtConcurrent::run([=]() {_update(flags);});
+    void run() override {
+        if (cmd == "upgrade") {
+            _do("upgrade", "Upgrading", "Upgraded", "upgrading");
+        }
+        if (cmd == "install") {
+            _do("install", "Installing", "Installed", "installing");
+        }
+        if (cmd == "remove") {
+            _do("remove", "Removing", "Removed", "removing");
+        }
+        if (cmd == "update") {
+            _update();
+        }
     }
-    Q_INVOKABLE void upgrade(QString packageName) {
-        QtConcurrent::run([=]() {_upgrade(packageName);});
-    }
-    Q_INVOKABLE void install(QString packageName) {
-        QtConcurrent::run([=]() {_install(packageName);});
-    }
-    Q_INVOKABLE void remove(QString packageName) {
-        QtConcurrent::run([=]() {_remove(packageName);});
-    }
-    Q_INVOKABLE QStringList getInfo(QString packageName) {
-        auto ret = _opkg("info", packageName);
-        
-        return ret.std.split(QRegExp("[\r\n]"),Qt::SkipEmptyParts);
+    void execute(QString c, QString p, int f = 0x0f) {
+        flags = f;
+        cmd = c;
+        packageName = p;
+        start();
     }
     
     QString state_get() {
@@ -146,6 +120,75 @@ public:
     }
     QStringList installedPackages_get() {
         return m_installedPackages;
+    }
+signals:
+    void allPackages_changed(QStringList);
+    void installedPackages_changed(QStringList);
+    void upgradablePackages_changed(QStringList);
+    void state_changed(QString);
+};
+class AthenaOPKG : public QObject, public AthenaBase
+{
+    Q_OBJECT
+    Q_PROPERTY(QStringList allPackages READ allPackages_get NOTIFY allPackages_changed);
+    Q_PROPERTY(QStringList installedPackages READ installedPackages_get NOTIFY installedPackages_changed);
+    Q_PROPERTY(QStringList upgradablePackages READ upgradablePackages_get NOTIFY upgradablePackages_changed);
+    Q_PROPERTY(QString state READ state_get NOTIFY state_changed);
+    
+private:
+    QStringList m_allPackages;
+    QStringList m_installedPackages;
+    QStringList m_upgradablePackages;
+    QString m_state;
+    
+    OPKGThread opkgThread;
+    
+    QProcessRet _opkg(const QString& cmd, const QString additional_arg = "") {
+        return runProcess("/opt/bin/opkg", cmd, additional_arg);
+    }
+public:
+    Q_INVOKABLE void update(int flags = 0x0f) {
+        opkgThread.execute("update", "", flags);
+    }
+    Q_INVOKABLE void upgrade(QString packageName, bool block = true) {
+        opkgThread.execute("upgrade", packageName);
+        if (block)
+            opkgThread.wait();
+    }
+    Q_INVOKABLE void install(QString packageName, bool block = true) {
+        opkgThread.execute("install", packageName);
+        if (block)
+            opkgThread.wait();
+    }
+    Q_INVOKABLE void remove(QString packageName, bool block = true) {
+        opkgThread.execute("remove", packageName);
+        if (block)
+            opkgThread.wait();
+    }
+    Q_INVOKABLE QStringList getInfo(QString packageName) {
+        auto ret = _opkg("info", packageName);
+        
+        return ret.std.split(QRegExp("[\r\n]"),Qt::SkipEmptyParts);
+    }
+    
+    QString state_get() {
+        return opkgThread.state_get();
+    }
+    QStringList allPackages_get() {
+        return opkgThread.allPackages_get();
+    }
+    QStringList upgradablePackages_get() {
+        return opkgThread.upgradablePackages_get();
+    }
+    QStringList installedPackages_get() {
+        return opkgThread.installedPackages_get();
+    }
+    
+    AthenaOPKG() {
+        connect(&opkgThread, &OPKGThread::allPackages_changed, this, &AthenaOPKG::allPackages_changed);
+        connect(&opkgThread, &OPKGThread::installedPackages_changed, this, &AthenaOPKG::installedPackages_changed);
+        connect(&opkgThread, &OPKGThread::upgradablePackages_changed, this, &AthenaOPKG::upgradablePackages_changed);
+        connect(&opkgThread, &OPKGThread::state_changed, this, &AthenaOPKG::state_changed);
     }
 signals:
     void allPackages_changed(QStringList);

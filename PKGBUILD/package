@@ -7,7 +7,7 @@ timestamp=$(date +"%Y-%m-%dT%H:%M:%S%z")
 pkgdesc="Athena hook"
 section="utils"
 maintainer="Lonely Transistor <lonelytransistor@protonmail.com>"
-installdepends=(athena-linux)
+installdepends=(athena-linux openssh-keygen openssh-server procps-ng-ps inotifywait coreutils-df wget-ssl)
 license=GPL-3.0-or-later
 image=qt:v2.2.2
 makedepends=()
@@ -39,7 +39,15 @@ configure() {
         sed -i '/OnFailure=.*$/d' /lib/systemd/system/xochitl.service
         sed -i '/WatchdogSec=.*$/d' /lib/systemd/system/xochitl.service
         systemctl daemon-reload
-        bash -c "sleep 10 && systemctl stop xochitl && systemctl start rm2fb && systemctl start xochitl" &
+        systemctl enable adjust-epd
+        systemctl enable rm2fb
+        systemctl enable zram
+        systemctl start sshdgenkeys
+        systemctl enable sshd
+        systemctl enable sshd-watchdog
+        systemctl disable dropbear.socket
+        
+        bash -c "sleep 10 ; systemctl stop xochitl ; systemctl start rm2fb ; systemctl start xochitl ; systemctl stop dropbear.socket ; systemctl start sshd ; systemctl start sshd-watchdog" &
         disown
     fi
 }
@@ -66,6 +74,9 @@ package() {
     
     _install -m 644 -D "${srcdir}/root/rm2fb.service" "${pkgdir}/lib/systemd/system/rm2fb.service"
     _install -m 644 -D "${srcdir}/root/adjust-epd.service" "${pkgdir}/lib/systemd/system/adjust-epd.service"
+    _install -m 755 -D "${srcdir}/root/sshdgenkeys.service" "${pkgdir}/lib/systemd/system/sshdgenkeys.service"
+    _install -m 755 -D "${srcdir}/root/sshd.service" "${pkgdir}/lib/systemd/system/sshd.service"
+    _install -m 755 -D "${srcdir}/root/sshd-watchdog.service" "${pkgdir}/lib/systemd/system/sshd-watchdog.service"
     
     # /etc/ld.so.conf.d/ Add opt dirs
     _install -m 644 -D "${srcdir}/root/ld-opt.conf" "${pkgdir}/etc/ld.so.conf.d/opt.conf"
@@ -80,6 +91,8 @@ package() {
     mkdir -p "${pkgdir}"/etc/systemd/system/multi-user.target.wants/
     ln -s /lib/systemd/system/rm2fb.service "${pkgdir}/etc/systemd/system/multi-user.target.wants/rm2fb.service"
     ln -s /lib/systemd/system/adjust-epd.service "${pkgdir}/etc/systemd/system/multi-user.target.wants/adjust-epd.service"
+    ln -s /lib/systemd/system/sshd.service "${pkgdir}/etc/systemd/system/multi-user.target.wants/sshd.service"
+    ln -s /lib/systemd/system/sshd-watchdog.service "${pkgdir}/etc/systemd/system/multi-user.target.wants/sshd-watchdog.service"
     
     # /etc/systemd/system/ Create units.d -> athena.conf
     mkdir -p "${pkgdir}"/etc/systemd/system/{multi-user.target.wants,draft.service.d,remux.service.d,tarnish.service.d,xochitl.service.d}/
@@ -116,4 +129,7 @@ package() {
     ln -s /opt/lib/librm2fb_server.so.1.0.1 "${pkgdir}/usr/lib/librm2fb_server.so.1.0"
     ln -s /opt/lib/librm2fb_server.so.1.0.1 "${pkgdir}/usr/lib/librm2fb_server.so.1.0.1"
     
+    # /usr/bin/ wget-ssl
+    _install -d "${pkgdir}/usr/lib"
+    ln -s /opt/bin/wget /usr/bin/wget
 }
