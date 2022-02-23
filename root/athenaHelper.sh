@@ -25,7 +25,7 @@ if [ "$1" == "--initialize-athena" ]; then
     # Start/stop services
     systemctl stop xochitl
     systemctl stop rm2fb
-    systemctl start adjust-edp
+    systemctl start adjust-epd
     systemctl start zram
     systemctl start rm2fb
     systemctl stop dropbear.socket

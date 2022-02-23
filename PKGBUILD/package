@@ -68,10 +68,10 @@ package() {
     _install -m 644 -D "${srcdir}/root/zram.service" "${pkgdir}/lib/systemd/system/zram.service"
     _install -m 644 -D "${srcdir}/root/rm2fb.service" "${pkgdir}/lib/systemd/system/rm2fb.service"
     _install -m 644 -D "${srcdir}/root/adjust-epd.service" "${pkgdir}/lib/systemd/system/adjust-epd.service"
-    _install -m 755 -D "${srcdir}/root/sshdgenkeys.service" "${pkgdir}/lib/systemd/system/sshdgenkeys.service"
-    _install -m 755 -D "${srcdir}/root/sshd.service" "${pkgdir}/lib/systemd/system/sshd.service"
-    _install -m 755 -D "${srcdir}/root/sshd-watchdog.service" "${pkgdir}/lib/systemd/system/sshd-watchdog.service"
-    _install -m 755 -D "${srcdir}/root/athenaInitialize.service" "${pkgdir}/lib/systemd/system/athenaInitialize.service"
+    _install -m 644 -D "${srcdir}/root/sshdgenkeys.service" "${pkgdir}/lib/systemd/system/sshdgenkeys.service"
+    _install -m 644 -D "${srcdir}/root/sshd.service" "${pkgdir}/lib/systemd/system/sshd.service"
+    _install -m 644 -D "${srcdir}/root/sshd-watchdog.service" "${pkgdir}/lib/systemd/system/sshd-watchdog.service"
+    _install -m 644 -D "${srcdir}/root/athenaInitialize.service" "${pkgdir}/lib/systemd/system/athenaInitialize.service"
     
     # /etc/ld.so.conf.d/ Add opt dirs
     _install -m 644 -D "${srcdir}/root/ld-opt.conf" "${pkgdir}/etc/ld.so.conf.d/opt.conf"
