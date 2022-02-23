@@ -1,5 +1,5 @@
 [Unit]
-Description=Athena EPD adjustment
+Description=Reconfigure zRAM in Athena Kernel
 After=home.mount
 
 [Service]

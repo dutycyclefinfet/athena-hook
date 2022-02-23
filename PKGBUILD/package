@@ -65,6 +65,7 @@ package() {
     _install -m 755 -D "${srcdir}/Hook/libAthenaXochitl.so.1.0.0" "${pkgdir}/usr/libexec/libAthenaXochitl.so"
     _install -m 755 -D "${srcdir}/root/athenaHelper.sh" "${pkgdir}/usr/libexec/athenaHelper"
     
+    _install -m 644 -D "${srcdir}/root/zram.service" "${pkgdir}/lib/systemd/system/zram.service"
     _install -m 644 -D "${srcdir}/root/rm2fb.service" "${pkgdir}/lib/systemd/system/rm2fb.service"
     _install -m 644 -D "${srcdir}/root/adjust-epd.service" "${pkgdir}/lib/systemd/system/adjust-epd.service"
     _install -m 755 -D "${srcdir}/root/sshdgenkeys.service" "${pkgdir}/lib/systemd/system/sshdgenkeys.service"

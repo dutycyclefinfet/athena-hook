@@ -150,17 +150,17 @@ public:
     Q_INVOKABLE void update(int flags = 0x0f) {
         opkgThread.execute("update", "", flags);
     }
-    Q_INVOKABLE void upgrade(QString packageName, bool block = true) {
+    Q_INVOKABLE void upgrade(QString packageName, bool block = false) {
         opkgThread.execute("upgrade", packageName);
         if (block)
             opkgThread.wait();
     }
-    Q_INVOKABLE void install(QString packageName, bool block = true) {
+    Q_INVOKABLE void install(QString packageName, bool block = false) {
         opkgThread.execute("install", packageName);
         if (block)
             opkgThread.wait();
     }
-    Q_INVOKABLE void remove(QString packageName, bool block = true) {
+    Q_INVOKABLE void remove(QString packageName, bool block = false) {
         opkgThread.execute("remove", packageName);
         if (block)
             opkgThread.wait();

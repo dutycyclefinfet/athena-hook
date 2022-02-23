@@ -29,8 +29,8 @@ if [ "$1" == "--initialize-athena" ]; then
     systemctl start zram
     systemctl start rm2fb
     systemctl stop dropbear.socket
-    killall dropbear 2>/dev/null
-    killall -0 dropbear && sleep 5 ; killall -9 dropbear 2>/dev/null
+    killall dropbear >/dev/null 2>&1
+    killall -0 dropbear >/dev/null 2>&1 && sleep 5 ; killall -9 dropbear >/dev/null 2>&1
     systemctl start sshd
     systemctl start sshd-watchdog
     systemctl start xochitl

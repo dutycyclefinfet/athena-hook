@@ -14,10 +14,9 @@
 #include <QProcessEnvironment>
 #include <QQuickItem>
 #include <sys/sysinfo.h>
+#include <sys/types.h>
 #include <signal.h>
 #include "AthenaBase.h"
-
-#include <QDebug>
 
 
 class AthenaSystem : public QObject, public AthenaBase
@@ -49,8 +48,9 @@ public:
         return QFile::link(path, name);
     }
     
-    Q_INVOKABLE int kill(int pid, int sig = SIGTERM) {
-        return kill(pid, sig);
+    Q_INVOKABLE int kill(int p, int sig = SIGTERM) {
+        pid_t pid = p;
+        return ::kill(pid, sig);
     };
     
     Q_INVOKABLE QString readLink(const QString& path) {
