@@ -14,6 +14,7 @@
 #include <QProcessEnvironment>
 #include <QQuickItem>
 #include <sys/sysinfo.h>
+#include <signal.h>
 #include "AthenaBase.h"
 
 #include <QDebug>
@@ -47,6 +48,10 @@ public:
     Q_INVOKABLE bool link(const QString& path, const QString& name) {
         return QFile::link(path, name);
     }
+    
+    Q_INVOKABLE int kill(int pid, int sig = SIGTERM) {
+        return kill(pid, sig);
+    };
     
     Q_INVOKABLE QString readLink(const QString& path) {
         return QFile::symLinkTarget(path);

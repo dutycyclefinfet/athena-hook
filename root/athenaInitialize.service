@@ -1,0 +1,10 @@
+[Unit]
+Description=Initialize or update Athena Overlayfs
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/athenaHelper --initialize-athena
+StandardOutput=journal
+
+[Install]
+WantedBy=multi-user.target

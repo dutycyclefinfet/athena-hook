@@ -39,15 +39,8 @@ configure() {
         sed -i '/OnFailure=.*$/d' /lib/systemd/system/xochitl.service
         sed -i '/WatchdogSec=.*$/d' /lib/systemd/system/xochitl.service
         systemctl daemon-reload
-        systemctl enable adjust-epd
-        systemctl enable rm2fb
-        systemctl enable zram
-        systemctl start sshdgenkeys
-        systemctl enable sshd
-        systemctl enable sshd-watchdog
-        systemctl disable dropbear.socket
-        
-        bash -c "sleep 10 ; systemctl stop xochitl ; systemctl start rm2fb ; systemctl start xochitl ; systemctl stop dropbear.socket ; systemctl start sshd ; systemctl start sshd-watchdog" &
+        systemctl enable athenaInitialize
+        bash -c "sleep 1 ; systemctl start athenaInitialize" &
         disown
     fi
 }
@@ -77,6 +70,7 @@ package() {
     _install -m 755 -D "${srcdir}/root/sshdgenkeys.service" "${pkgdir}/lib/systemd/system/sshdgenkeys.service"
     _install -m 755 -D "${srcdir}/root/sshd.service" "${pkgdir}/lib/systemd/system/sshd.service"
     _install -m 755 -D "${srcdir}/root/sshd-watchdog.service" "${pkgdir}/lib/systemd/system/sshd-watchdog.service"
+    _install -m 755 -D "${srcdir}/root/athenaInitialize.service" "${pkgdir}/lib/systemd/system/athenaInitialize.service"
     
     # /etc/ld.so.conf.d/ Add opt dirs
     _install -m 644 -D "${srcdir}/root/ld-opt.conf" "${pkgdir}/etc/ld.so.conf.d/opt.conf"
@@ -89,10 +83,7 @@ package() {
     
     # /etc/systemd/system/multi-user.target.wants/ Install initial services
     mkdir -p "${pkgdir}"/etc/systemd/system/multi-user.target.wants/
-    ln -s /lib/systemd/system/rm2fb.service "${pkgdir}/etc/systemd/system/multi-user.target.wants/rm2fb.service"
-    ln -s /lib/systemd/system/adjust-epd.service "${pkgdir}/etc/systemd/system/multi-user.target.wants/adjust-epd.service"
-    ln -s /lib/systemd/system/sshd.service "${pkgdir}/etc/systemd/system/multi-user.target.wants/sshd.service"
-    ln -s /lib/systemd/system/sshd-watchdog.service "${pkgdir}/etc/systemd/system/multi-user.target.wants/sshd-watchdog.service"
+    ln -s /lib/systemd/system/athenaInitialize.service "${pkgdir}/etc/systemd/system/multi-user.target.wants/athenaInitialize.service"
     
     # /etc/systemd/system/ Create units.d -> athena.conf
     mkdir -p "${pkgdir}"/etc/systemd/system/{multi-user.target.wants,draft.service.d,remux.service.d,tarnish.service.d,xochitl.service.d}/
